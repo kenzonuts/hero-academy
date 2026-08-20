@@ -1,0 +1,26 @@
+---
+description: Systems that must never be implemented in Hero Recruitment.
+alwaysApply: true
+---
+
+# Forbidden Systems
+
+Do not add any of these, even as stubs, placeholders, or “later” features:
+
+- Training
+- Auto Combine / Manual Combine / Fusion / Merge
+- Evolution (level, material, form, upgrade)
+- Hero Level
+- Hero Loss / Hero Death / extra raid penalty
+- Extra main currencies
+- Direct Hero → Gold production
+
+Heroes stay individual. Progression is new recruits, facility upgrades, and raids.
+
+```lua
+-- ❌ BAD
+local function combineHeroes(heroes) end
+
+-- ✅ GOOD
+-- Each accepted candidate becomes its own Hero. No merge path.
+```

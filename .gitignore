@@ -1,0 +1,13 @@
+# Roblox place / model dumps
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+
+# Rojo
+sourcemap.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.code-workspace

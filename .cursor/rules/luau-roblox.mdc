@@ -1,0 +1,25 @@
+---
+description: Luau conventions for the Hero Recruitment Rojo project.
+globs: "**/*.{lua,luau}"
+alwaysApply: false
+---
+
+# Luau / Rojo
+
+- Use `--!strict`.
+- Read economy numbers from `GameConfig`. Do not hardcode fees, ratios, or raid caps.
+- Keep Recruit, Accept, Convert, and Raid resolve on the server.
+- `ACTIVE` produces Magic Stone. `RAIDING` does not.
+- Gold and Magic Stone changes must be atomic: check, then subtract, then apply. No partial Accept payments.
+
+```lua
+-- ❌ BAD
+gold -= 50 -- magic number, client-trusted
+
+-- ✅ GOOD
+local fee = GameConfig.Recruitment.RecruitFeeGold
+if gold < fee then
+	return
+end
+gold -= fee
+```

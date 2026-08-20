@@ -1,0 +1,29 @@
+---
+description: Master design freeze for Hero Recruitment. Always follow GAME_LOGIC.md.
+alwaysApply: true
+---
+
+# Hero Recruitment — Design Freeze
+
+Source of truth: `GAME_LOGIC.md`. Tune example numbers in `src/shared/GameConfig.lua`. Do not break these rules.
+
+## Economy
+
+- Only Gold and Magic Stone.
+- Heroes produce Magic Stone, never Gold.
+- Converter is always `1 Magic Stone = 1 Gold`. Upgrade speed only.
+
+## Recruitment
+
+- Recruit Fee and Accept Fee are separate charges.
+- Recruit Fee is never refunded, including on Reject.
+- Max 1 Pending Candidate. Recruit stays locked until Accept or Reject.
+- Candidate stats lock at generation. No reroll, expire, or mutate.
+
+## Raid
+
+- Team size is 1–5 heroes.
+- Recommended Power is not a hard gate.
+- Fail = no reward, no hero loss. `RAIDING` heroes pause production.
+
+Studio AI should read `ReplicatedStorage.Shared.GameRules`.
