@@ -558,6 +558,21 @@ function RecruitmentBoard.Create(
 		end
 	end
 
+	local function paintActionButtons()
+		local pending = pendingCards()
+		local hasCards = #pending > 0
+		local hasClosed = false
+		for _, card in pending do
+			if not revealedIds[card.CandidateID] then
+				hasClosed = true
+				break
+			end
+		end
+		takeAll.Visible = hasCards
+		clearAll.Visible = hasCards
+		openAll.Visible = hasClosed
+	end
+
 	local function flipOpen(index: number, card: Types.Candidate)
 		local id = card.CandidateID
 		if revealedIds[id] or flippingIds[id] then
@@ -586,6 +601,7 @@ function RecruitmentBoard.Create(
 			else
 				showEmpty(index)
 			end
+			paintActionButtons()
 			return
 		end
 
@@ -600,6 +616,7 @@ function RecruitmentBoard.Create(
 		grow.Completed:Wait()
 		slot.Size = UDim2.fromScale(1, 1)
 		flippingIds[id] = nil
+		paintActionButtons()
 	end
 
 	local function paintSlots()
@@ -632,17 +649,7 @@ function RecruitmentBoard.Create(
 			end
 		end
 
-		local hasCards = #pending > 0
-		local hasClosed = false
-		for _, card in pending do
-			if not revealedIds[card.CandidateID] then
-				hasClosed = true
-				break
-			end
-		end
-		takeAll.Visible = hasCards
-		clearAll.Visible = hasCards
-		openAll.Visible = hasClosed
+		paintActionButtons()
 
 		local gold = if latestSnapshot then latestSnapshot.Gold else 0
 		local heroes = if latestSnapshot then latestSnapshot.HeroCount else 0
