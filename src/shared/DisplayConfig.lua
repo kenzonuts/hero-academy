@@ -242,6 +242,11 @@ function DisplayConfig.RecruitmentSlotClosedImage(): string
 	return thumbImage(display and display.RecruitmentSlotClosedImage, "71614679116854")
 end
 
+function DisplayConfig.RecruitmentCardGlowImage(): string
+	local display = GameConfig.Display
+	return thumbImage(display and display.RecruitmentCardGlowImage, "76685873525509")
+end
+
 local CARD_TIER_KEY = {
 	B1 = "B1",
 	B2 = "B2",

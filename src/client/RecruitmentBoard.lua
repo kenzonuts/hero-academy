@@ -25,6 +25,8 @@ local SLOT_PAD = UDim2.fromOffset(10, 12)
 local CLOSE_SIZE = 40
 local CLOSE_POS = UDim2.new(1, -10, 0, 14)
 local FLIP_HALF = 0.12
+local GLOW_SIZE = 1.35
+local GLOW_SPIN_SECONDS = 10
 
 local function fmtCompact(value: number): string
 	local n = math.floor(value + 0.5)
@@ -292,16 +294,39 @@ function RecruitmentBoard.Create(
 
 	local emptyImage = DisplayConfig.RecruitmentSlotEmptyImage()
 	local closedImage = DisplayConfig.RecruitmentSlotClosedImage()
+	local glowImage = DisplayConfig.RecruitmentCardGlowImage()
 	local slotButtons: { ImageButton } = {}
 	local slotFaces: { TextLabel } = {}
+	local slotGlows: { ImageLabel } = {}
 	for index = 1, SLOT_COUNT do
 		local cell = Instance.new("Frame")
 		cell.Name = "Slot" .. tostring(index)
 		cell.LayoutOrder = index
 		cell.BackgroundTransparency = 1
 		cell.BorderSizePixel = 0
+		cell.ClipsDescendants = false
 		cell.ZIndex = 10
 		cell.Parent = grid
+
+		local glow = Instance.new("ImageLabel")
+		glow.Name = "Glow"
+		glow.AnchorPoint = Vector2.new(0.5, 0.5)
+		glow.Position = UDim2.fromScale(0.5, 0.5)
+		glow.Size = UDim2.fromScale(GLOW_SIZE, GLOW_SIZE)
+		glow.BackgroundTransparency = 1
+		glow.BorderSizePixel = 0
+		glow.Image = glowImage
+		glow.ScaleType = Enum.ScaleType.Fit
+		glow.Visible = false
+		glow.ZIndex = 9
+		glow.Parent = cell
+		local spin = TweenService:Create(
+			glow,
+			TweenInfo.new(GLOW_SPIN_SECONDS, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
+			{ Rotation = 360 }
+		)
+		spin:Play()
+		table.insert(slotGlows, glow)
 
 		local slot = Instance.new("ImageButton")
 		slot.Name = "Card"
@@ -552,6 +577,13 @@ function RecruitmentBoard.Create(
 		end
 	end
 
+	local function setGlow(index: number, on: boolean)
+		local glow = slotGlows[index]
+		if glow then
+			glow.Visible = on
+		end
+	end
+
 	local function showEmpty(index: number)
 		local slot = slotButtons[index]
 		local face = slotFaces[index]
@@ -561,6 +593,7 @@ function RecruitmentBoard.Create(
 		slot.Active = false
 		face.Visible = false
 		face.Text = ""
+		setGlow(index, false)
 	end
 
 	local function showClosed(index: number)
@@ -572,6 +605,7 @@ function RecruitmentBoard.Create(
 		slot.Active = true
 		face.Visible = false
 		face.Text = ""
+		setGlow(index, false)
 	end
 
 	local function showRevealed(index: number, card: Types.Candidate)
@@ -582,6 +616,7 @@ function RecruitmentBoard.Create(
 		slot.AutoButtonColor = false
 		slot.Active = false
 		face.Visible = true
+		setGlow(index, true)
 		if art then
 			face.Text = string.format("%d PWR\n%d/s", card.Power, card.Production)
 		else

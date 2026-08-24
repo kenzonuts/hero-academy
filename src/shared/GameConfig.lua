@@ -166,6 +166,7 @@ local GameConfig = {
 		RecruitmentBoardCloseImage = "rbxassetid://101015762977670",
 		RecruitmentSlotEmptyImage = "rbxassetid://118354964205016",
 		RecruitmentSlotClosedImage = "rbxassetid://71614679116854",
+		RecruitmentCardGlowImage = "rbxassetid://76685873525509",
 		RecruitmentTakeAllImage = "rbxassetid://81879706897992",
 		RecruitmentTakeAllOffImage = "rbxassetid://124096776237817",
 		RecruitmentClearAllImage = "rbxassetid://82321373313572",
