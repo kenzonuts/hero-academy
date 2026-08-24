@@ -511,7 +511,7 @@ Default:
 
 Untuk menjaga ekonomi, board menampung maksimal **10 Pending Candidate**.
 
-Recruit 1X / 5X / 10X hanya mengisi slot kosong. Kalau slot atau roster 40 penuh, pull ditolak. TAKE ALL = Accept semua. CLEAR ALL = Reject semua (fee hangus).
+Recruit 1X / 5X / 10X hanya mengisi slot kosong. Kalau slot atau roster 40 penuh, pull ditolak. Klik kartu yang sudah terbuka = Accept kartu itu saja. TAKE ALL = Accept semua. CLEAR ALL = Reject semua (fee hangus).
 
 ```text
 Recruit 1X / 5X / 10X
@@ -530,7 +530,7 @@ Empty slots on the board?
            └── YES → bayar fee × jumlah, isi slot kosong
 ```
 
-Kartu baru tetap tertutup sampai OPEN ALL. TAKE ALL = Accept semua. CLEAR ALL = Reject semua (fee hangus).
+Kartu baru tetap tertutup sampai OPEN ALL atau diklik. Klik kartu terbuka = Accept satu. TAKE ALL = Accept semua. CLEAR ALL = Reject semua (fee hangus).
 
 ---
 
@@ -2190,7 +2190,7 @@ Sistem berikut secara resmi **tidak digunakan**:
 - Tidak ada expiration
 - Maksimal 10 Pending Candidate di Recruitment Board
 - Recruit 1X / 5X / 10X mengisi slot kosong
-- TAKE ALL menerima semua kartu; CLEAR ALL menolak semua
+- Klik kartu terbuka menerima kartu itu saja. TAKE ALL menerima semua kartu; CLEAR ALL menolak semua
 - Setelah Gold cukup, player dapat Accept
 
 ### 🦸 Hero

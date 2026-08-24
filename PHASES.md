@@ -16,7 +16,7 @@ Facility upgrades adalah **Phase 5** (selesai). Raid adalah **Phase 6** (selesai
 | 7 | UI polish | Done | Visual, layout, feedback — logic tetap di server |
 | 8A | Recruitment Board shell | Done | Frame aset + tombol X; buka saat **sentuh** `summon`; gerak lock sampai X |
 | 8B | Board grid | Done | 10 slot (2×5) + rail Recruit 1/5/10X + TAKE/CLEAR/OPEN (tampilan) |
-| 8C | Recruit 1X | Done | Kartu tertutup → OPEN ALL → TAKE ALL / CLEAR ALL; tab Recruit HUD dihapus |
+| 8C | Recruit 1X | Done | Kartu tertutup → OPEN / klik buka → klik ambil satu, TAKE ALL, atau CLEAR ALL; tab Recruit HUD dihapus |
 | 8D | Altar open | Done | Board dari `altar/summon` (sentuh, bukan jarak / tab HUD) |
 | 8E | Board penuh | Done | 5X / 10X, OPEN ALL, TAKE ALL, CLEAR ALL — pending maks 10 |
 
@@ -99,8 +99,8 @@ Selesai kalau:
 - RECRUIT 5X / 10X bayar fee × 5 / × 10 dan mengisi slot kosong
 - Pull ditolak jika slot tidak cukup, Gold tidak cukup, atau roster + pending + pull > 40
 - OPEN ALL membuka semua kartu tertutup
-- TAKE ALL menerima semua kartu; CLEAR ALL menolak semua (fee hangus)
-- Kartu baru tetap tertutup sampai OPEN ALL
+- Klik kartu terbuka menerima kartu itu saja; TAKE ALL menerima semua; CLEAR ALL menolak semua (fee hangus)
+- Kartu baru tetap tertutup sampai dibuka
 
 Progress player (Gold, Hero, upgrade, Raid) disimpan lewat DataStore.
 

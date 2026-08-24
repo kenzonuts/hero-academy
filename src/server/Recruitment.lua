@@ -300,7 +300,7 @@ function Recruitment.Recruit(player: Player, mode: any): Types.ActionResult
 	return ok(string.format("Rolled %d candidates. Open, take, or clear them.", count))
 end
 
-function Recruitment.Accept(player: Player): Types.ActionResult
+function Recruitment.Accept(player: Player, candidateId: any): Types.ActionResult
 	local state = PlayerData.Get(player)
 	if not state then
 		return fail("NO_SESSION", "Player data not found.")
@@ -311,7 +311,29 @@ function Recruitment.Accept(player: Player): Types.ActionResult
 		return fail("NO_CANDIDATE", "No pending candidate.")
 	end
 
-	if #state.Heroes + #list > Collection.MaxOwned() then
+	local pickIndex: number? = nil
+	if typeof(candidateId) == "string" and candidateId ~= "" then
+		for index, candidate in list do
+			if candidate.CandidateID == candidateId then
+				pickIndex = index
+				break
+			end
+		end
+		if pickIndex == nil then
+			return fail("NO_CANDIDATE", "That card is gone.")
+		end
+	end
+
+	local targets: { Types.Candidate } = {}
+	if pickIndex then
+		table.insert(targets, list[pickIndex])
+	else
+		for _, candidate in list do
+			table.insert(targets, candidate)
+		end
+	end
+
+	if #state.Heroes + #targets > Collection.MaxOwned() then
 		return fail(
 			"ROSTER_FULL",
 			string.format("Roster is full (%d/%d). Sell a Hero to take these cards.", #state.Heroes, Collection.MaxOwned())
@@ -321,7 +343,7 @@ function Recruitment.Accept(player: Player): Types.ActionResult
 	local chargeAccept = GameConfig.Recruitment.ChargeAcceptFee == true
 	if chargeAccept then
 		local total = 0
-		for _, candidate in list do
+		for _, candidate in targets do
 			total += candidate.AcceptCost
 		end
 		if not Economy.TrySpendGold(player, total) then
@@ -330,8 +352,8 @@ function Recruitment.Accept(player: Player): Types.ActionResult
 	end
 
 	local bagged = 0
-	local first = list[1]
-	for _, candidate in list do
+	local first = targets[1]
+	for _, candidate in targets do
 		local hero = candidateToHero(candidate)
 		Collection.PlaceOnDisplay(hero, state.Heroes)
 		table.insert(state.Heroes, hero)
@@ -340,10 +362,15 @@ function Recruitment.Accept(player: Player): Types.ActionResult
 		end
 	end
 
-	local taken = #list
-	state.PendingCandidates = {}
-	state.PendingCandidate = nil
+	if pickIndex then
+		table.remove(list, pickIndex)
+		syncHead(state)
+	else
+		state.PendingCandidates = {}
+		state.PendingCandidate = nil
+	end
 
+	local taken = #targets
 	if taken == 1 and first then
 		if bagged > 0 then
 			return ok(string.format("Accepted %s %s. Display full — sent to Bag.", first.Tier, first.HeroType))

@@ -18,7 +18,7 @@ Source of truth: `GAME_LOGIC.md`. Tune example numbers in `src/shared/GameConfig
 - Recruit Fee is paid to roll a candidate. **Accept is free.**
 - High-tier (expensive) Heroes have a very low roll chance.
 - Recruit Fee is never refunded, including on Reject or Sell.
-- Max 10 pending cards on the Recruitment Board. Recruit 1X / 5X / 10X fill empty slots. TAKE ALL accepts all; CLEAR ALL rejects all.
+- Max 10 pending cards on the Recruitment Board. Recruit 1X / 5X / 10X fill empty slots. Click an opened card to accept that one. TAKE ALL accepts all; CLEAR ALL rejects all.
 - Candidate stats lock at generation. No reroll, expire, or mutate.
 
 ## Sell

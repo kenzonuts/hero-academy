@@ -66,8 +66,8 @@ remotes.Recruit.OnServerInvoke = function(player: Player, mode: any)
 	return withResult(player, Recruitment.Recruit(player, mode))
 end
 
-remotes.Accept.OnServerInvoke = function(player: Player)
-	return withResult(player, Recruitment.Accept(player))
+remotes.Accept.OnServerInvoke = function(player: Player, candidateId: any)
+	return withResult(player, Recruitment.Accept(player, candidateId))
 end
 
 remotes.Reject.OnServerInvoke = function(player: Player)

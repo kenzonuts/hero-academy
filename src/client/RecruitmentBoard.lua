@@ -20,8 +20,8 @@ local CONTENT_POS = UDim2.new(0.5, 0, 0.56, 0)
 local CONTENT_SIZE = UDim2.new(0.9, 0, 0.7, 0)
 local SLOT_COLUMNS = 5
 local SLOT_COUNT = 10
-local SLOT_CELL = UDim2.new(0.17, 0, 0.46, 0)
-local SLOT_PAD = UDim2.fromOffset(10, 12)
+local SLOT_CELL = UDim2.new(0.188, 0, 0.50, 0)
+local SLOT_PAD = UDim2.fromOffset(8, 8)
 local CLOSE_SIZE = 40
 local CLOSE_POS = UDim2.new(1, -10, 0, 14)
 local FLIP_HALF = 0.12
@@ -102,7 +102,7 @@ local function makeBottomButton(parent: Instance, name: string, offImage: string
 	local button = Instance.new("ImageButton")
 	button.Name = name
 	button.LayoutOrder = order
-	button.Size = UDim2.new(0.31, 0, 1, 0)
+	button.Size = UDim2.new(0.24, 0, 0.82, 0)
 	button.BackgroundTransparency = 1
 	button.BorderSizePixel = 0
 	button.AutoButtonColor = false
@@ -278,7 +278,7 @@ function RecruitmentBoard.Create(
 	grid.Name = "SlotGrid"
 	grid.BackgroundTransparency = 1
 	grid.Position = UDim2.fromScale(0, 0)
-	grid.Size = UDim2.new(1, 0, 0.76, 0)
+	grid.Size = UDim2.new(1, 0, 0.83, 0)
 	grid.ZIndex = 10
 	grid.Parent = left
 
@@ -371,8 +371,8 @@ function RecruitmentBoard.Create(
 	local bottom = Instance.new("Frame")
 	bottom.Name = "Actions"
 	bottom.BackgroundTransparency = 1
-	bottom.Position = UDim2.new(0, 0, 0.8, 0)
-	bottom.Size = UDim2.new(1, 0, 0.18, 0)
+	bottom.Position = UDim2.new(0, 0, 0.845, 0)
+	bottom.Size = UDim2.new(1, 0, 0.14, 0)
 	bottom.ZIndex = 11
 	bottom.Parent = left
 
@@ -380,7 +380,7 @@ function RecruitmentBoard.Create(
 	bottomLayout.FillDirection = Enum.FillDirection.Horizontal
 	bottomLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	bottomLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-	bottomLayout.Padding = UDim.new(0.03, 0)
+	bottomLayout.Padding = UDim.new(0.025, 0)
 	bottomLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	bottomLayout.Parent = bottom
 
@@ -613,8 +613,8 @@ function RecruitmentBoard.Create(
 		local face = slotFaces[index]
 		local art = DisplayConfig.RecruitmentCardImage(card.Tier, card.HeroType)
 		slot.Image = art or emptyImage
-		slot.AutoButtonColor = false
-		slot.Active = false
+		slot.AutoButtonColor = true
+		slot.Active = true
 		face.Visible = true
 		setGlow(index, true)
 		if art then
@@ -793,7 +793,11 @@ function RecruitmentBoard.Create(
 			if card == nil then
 				return
 			end
-			if revealedIds[card.CandidateID] or flippingIds[card.CandidateID] then
+			if flippingIds[card.CandidateID] then
+				return
+			end
+			if revealedIds[card.CandidateID] then
+				invoke(remotes.Accept, card.CandidateID)
 				return
 			end
 			task.spawn(function()
