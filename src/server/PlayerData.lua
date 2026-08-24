@@ -100,7 +100,7 @@ local function decodeHero(raw: any): Types.Hero?
 	if typeof(slot) == "number" then
 		displaySlot = math.floor(slot)
 	end
-	return {
+	local hero: Types.Hero = {
 		HeroID = asString(raw.HeroID, HttpService:GenerateGUID(false)),
 		HeroType = asString(raw.HeroType, "Knight"),
 		Tier = asString(raw.Tier, "B1"),
