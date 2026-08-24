@@ -98,35 +98,47 @@ local function makeBottomButton(parent: Instance, name: string, offImage: string
 end
 
 local function makeRecruitButton(parent: Instance, name: string, title: string, cost: number, order: number, onImage: string): ImageButton
+	local row = Instance.new("Frame")
+	row.Name = name
+	row.LayoutOrder = order
+	row.Size = UDim2.new(1, 0, 0.28, 0)
+	row.BackgroundTransparency = 1
+	row.ZIndex = 11
+	row.Parent = parent
+
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Name = "Title"
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Position = UDim2.fromScale(0, 0)
+	titleLabel.Size = UDim2.new(1, 0, 0.36, 0)
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.Text = title
+	titleLabel.TextColor3 = Color3.new(1, 1, 1)
+	titleLabel.TextScaled = true
+	titleLabel.ZIndex = 12
+	titleLabel.Parent = row
+	local titleStroke = Instance.new("UIStroke")
+	titleStroke.Thickness = 1.5
+	titleStroke.Color = Color3.new(0, 0, 0)
+	titleStroke.Parent = titleLabel
+
 	local button = Instance.new("ImageButton")
-	button.Name = name
-	button.LayoutOrder = order
-	button.Size = UDim2.new(1, 0, 0.28, 0)
+	button.Name = "Button"
+	button.Position = UDim2.new(0, 0, 0.38, 0)
+	button.Size = UDim2.new(1, 0, 0.62, 0)
 	button.BackgroundTransparency = 1
 	button.BorderSizePixel = 0
 	button.AutoButtonColor = false
 	button.Image = onImage
 	button.ScaleType = Enum.ScaleType.Fit
 	button.ZIndex = 11
-	button.Parent = parent
-
-	local titleLabel = Instance.new("TextLabel")
-	titleLabel.Name = "Title"
-	titleLabel.BackgroundTransparency = 1
-	titleLabel.Position = UDim2.new(0.08, 0, 0.08, 0)
-	titleLabel.Size = UDim2.new(0.84, 0, 0.42, 0)
-	titleLabel.Font = Enum.Font.GothamBold
-	titleLabel.Text = title
-	titleLabel.TextColor3 = Color3.new(1, 1, 1)
-	titleLabel.TextScaled = true
-	titleLabel.ZIndex = 12
-	titleLabel.Parent = button
+	button.Parent = row
 
 	local costRow = Instance.new("Frame")
 	costRow.Name = "Cost"
 	costRow.BackgroundTransparency = 1
-	costRow.Position = UDim2.new(0.06, 0, 0.52, 0)
-	costRow.Size = UDim2.new(0.88, 0, 0.4, 0)
+	costRow.Position = UDim2.fromScale(0, 0)
+	costRow.Size = UDim2.fromScale(1, 1)
 	costRow.ZIndex = 12
 	costRow.Parent = button
 
@@ -140,7 +152,7 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	local coin = Instance.new("ImageLabel")
 	coin.Name = "Coin"
 	coin.BackgroundTransparency = 1
-	coin.Size = UDim2.fromScale(0.22, 0.9)
+	coin.Size = UDim2.fromScale(0.28, 0.72)
 	coin.Image = DisplayConfig.RecruitmentGoldImage()
 	coin.ScaleType = Enum.ScaleType.Fit
 	coin.ZIndex = 12
@@ -152,7 +164,7 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	local amount = Instance.new("TextLabel")
 	amount.Name = "Amount"
 	amount.BackgroundTransparency = 1
-	amount.Size = UDim2.new(0.62, 0, 1, 0)
+	amount.Size = UDim2.new(0.55, 0, 0.78, 0)
 	amount.Font = Enum.Font.GothamBold
 	amount.Text = fmtInt(cost)
 	amount.TextColor3 = Color3.new(1, 1, 1)
