@@ -10,17 +10,18 @@
 ]]
 
 local GameRules = {
-	Version = "1.6",
+	Version = "1.7",
 	Loop = "RECRUIT → JUDGE → SAVE/ACCEPT → COLLECT → PRODUCE → CONVERT → INVEST → RAID → REWARD",
 
 	Currencies = {
 		Gold = "Primary currency. Recruit, upgrades. Small refund from selling purchased Heroes.",
-		MagicStone = "Hero production only. Never a second main currency.",
+		MagicStone = "Hero production. Converter 1 Magic Stone = 1 Gold.",
+		BlackCrystal = "Event raid drop only. Converter 1 Black Crystal = 10 Gold. Heroes never produce it.",
 	},
 
 	HardRules = {
-		"Heroes produce Magic Stone, never Gold.",
-		"Converter ratio is always 1 Magic Stone = 1 Gold. Upgrade speed only.",
+		"Heroes produce Magic Stone, never Gold or Black Crystal.",
+		"Converter: 1 Magic Stone = 1 Gold. Event Black Crystal converts 1 = 10 Gold. Upgrade speed only.",
 		"Recruit Fee is the Gold cost to roll a candidate. It scales with Recruitment level. 5X / 10X multiply the 1X fee. Accept is free.",
 		"Recruit Fee is never refunded, even on Reject or Sell.",
 		"High-tier Heroes are rare. Rarity is the cost of a free Accept.",
@@ -30,7 +31,8 @@ local GameRules = {
 		"Pending candidates do not expire, mutate, or reroll.",
 		"Candidate stats are locked at generation.",
 		"Heroes are ready immediately after Accept. No training.",
-		"Facility upgrades cost Gold. Converter upgrade changes speed only, never the 1:1 ratio.",
+		"Facility upgrades cost Gold. Converter upgrade changes speed only, never the Magic Stone 1:1 ratio.",
+		"Black Crystal drops only from successful Raids while Event.BlackCrystalRaid is on.",
 		"Raid team size is 1 to 5 heroes. One Raid at a time.",
 		"Recommended Power is not a hard gate. Power at or above Recommended can shorten Raid time, down to 50% duration.",
 		"Raid failure: no reward, no hero loss, no extra penalty. Opportunity cost is paused production.",
@@ -43,7 +45,7 @@ local GameRules = {
 		"If display is full, a newly accepted Hero goes to the Bag (BAGGED).",
 		"ACTIVE and BAGGED Heroes produce Magic Stone. RAIDING Heroes do not.",
 		"Progress is saved on leave and periodically while playing.",
-		"No Combine, Fusion, Merge, Evolution, Hero Level, Hero Death, or extra currencies.",
+		"No Combine, Fusion, Merge, Evolution, Hero Level, Hero Death, or shop/premium currencies.",
 	},
 
 	Forbidden = {

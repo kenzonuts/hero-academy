@@ -164,4 +164,19 @@ function RaidConfig.RollBonusLoot(): string
 	return fallback
 end
 
+function RaidConfig.BlackCrystalEventActive(): boolean
+	local event = GameConfig.Event
+	return event ~= nil and event.BlackCrystalRaid == true
+end
+
+function RaidConfig.BlackCrystalReward(map: any): number
+	if not RaidConfig.BlackCrystalEventActive() then
+		return 0
+	end
+	if typeof(map) == "table" and typeof(map.BlackCrystalReward) == "number" then
+		return math.max(0, math.floor(map.BlackCrystalReward))
+	end
+	return 0
+end
+
 return RaidConfig

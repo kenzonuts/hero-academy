@@ -109,6 +109,13 @@ local function resolve(player: Player, state: Types.PlayerState)
 				Economy.AddGold(player, baseGold)
 				table.insert(parts, string.format("+%d Gold", baseGold))
 			end
+			local blackCrystal = RaidConfig.BlackCrystalReward(map)
+			if blackCrystal > 0 then
+				local added = Economy.AddBlackCrystal(player, blackCrystal)
+				if added > 0 then
+					table.insert(parts, string.format("+%d Black Crystal", added))
+				end
+			end
 			if map.GuaranteesEliteTicket == true then
 				state.EliteTickets += 1
 				table.insert(parts, "Elite Ticket")

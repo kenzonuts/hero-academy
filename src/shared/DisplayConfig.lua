@@ -222,6 +222,11 @@ function DisplayConfig.MagicStoneImage(): string
 	return thumbImage(display and display.MagicStoneImage, "116631277815450")
 end
 
+function DisplayConfig.BlackCrystalImage(): string
+	local display = GameConfig.Display
+	return thumbImage(display and display.BlackCrystalImage, "96330948981939")
+end
+
 function DisplayConfig.RecruitmentBoardImage(): string
 	local display = GameConfig.Display
 	return thumbImage(display and display.RecruitmentBoardImage, "99473344266235")

@@ -33,12 +33,28 @@ function Converter.Tick(player: Player, dt: number)
 		return
 	end
 
-	local processed = Economy.RemoveMagicStone(player, Converter.GetSpeed(state.ConverterLevel) * dt)
-	if processed <= 0 then
+	local budget = Converter.GetSpeed(state.ConverterLevel) * dt
+	if budget <= 0 then
 		return
 	end
 
-	Economy.AddGold(player, processed * GameConfig.Conversion.MagicStoneToGold)
+	local fromBlack = Economy.RemoveBlackCrystal(player, budget)
+	if fromBlack > 0 then
+		local ratio = GameConfig.Conversion.BlackCrystalToGold
+		if typeof(ratio) ~= "number" or ratio < 1 then
+			ratio = 10
+		end
+		Economy.AddGold(player, fromBlack * ratio)
+		budget -= fromBlack
+	end
+	if budget <= 0 then
+		return
+	end
+
+	local fromStone = Economy.RemoveMagicStone(player, budget)
+	if fromStone > 0 then
+		Economy.AddGold(player, fromStone * GameConfig.Conversion.MagicStoneToGold)
+	end
 end
 
 return Converter

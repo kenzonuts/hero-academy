@@ -89,6 +89,7 @@ function Snapshot.ForPlayer(player: Player): Types.PlayerSnapshot?
 	return {
 		Gold = state.Gold,
 		MagicStone = state.MagicStone,
+		BlackCrystal = state.BlackCrystal or 0,
 		MagicStoneCapacity = state.MagicStoneCapacity,
 		ProductionPerSecond = Production.GetTotal(player),
 		ConverterSpeed = Converter.GetSpeed(state.ConverterLevel),

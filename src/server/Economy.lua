@@ -82,4 +82,34 @@ function Economy.RemoveMagicStone(player: Player, amount: number): number
 	return removed
 end
 
+function Economy.AddBlackCrystal(player: Player, amount: number): number
+	if amount <= 0 then
+		return 0
+	end
+
+	local state = PlayerData.Get(player)
+	if not state then
+		return 0
+	end
+
+	state.BlackCrystal += amount
+	return amount
+end
+
+function Economy.RemoveBlackCrystal(player: Player, amount: number): number
+	if amount <= 0 then
+		return 0
+	end
+
+	local state = PlayerData.Get(player)
+	if not state then
+		return 0
+	end
+
+	local have = state.BlackCrystal or 0
+	local removed = math.min(amount, have)
+	state.BlackCrystal = have - removed
+	return removed
+end
+
 return Economy

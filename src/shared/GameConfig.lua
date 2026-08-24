@@ -7,6 +7,8 @@
 local GameConfig = {
 	Conversion = {
 		MagicStoneToGold = 1,
+		-- Event currency. 1 Black Crystal = 10 Gold. Heroes never produce this.
+		BlackCrystalToGold = 10,
 	},
 
 	PendingCandidate = {
@@ -162,6 +164,7 @@ local GameConfig = {
 		MarkerHeight = 2.4,
 		GoldImage = "rbxassetid://129136027133209",
 		MagicStoneImage = "rbxassetid://116631277815450",
+		BlackCrystalImage = "rbxassetid://96330948981939",
 		RecruitmentBoardImage = "rbxassetid://99473344266235",
 		RecruitmentBoardCloseImage = "rbxassetid://101015762977670",
 		RecruitmentSlotEmptyImage = "rbxassetid://118354964205016",
@@ -282,6 +285,7 @@ local GameConfig = {
 				RecommendedPower = 500,
 				DurationSeconds = 180,
 				BaseGoldReward = 50000,
+				BlackCrystalReward = 8,
 			},
 			{
 				Id = "DesertRuins",
@@ -289,6 +293,7 @@ local GameConfig = {
 				RecommendedPower = 2000,
 				DurationSeconds = 300,
 				BaseGoldReward = 250000,
+				BlackCrystalReward = 15,
 			},
 			{
 				Id = "VolcanoFortress",
@@ -296,6 +301,7 @@ local GameConfig = {
 				RecommendedPower = 7500,
 				DurationSeconds = 420,
 				BaseGoldReward = 1000000,
+				BlackCrystalReward = 30,
 			},
 			{
 				Id = "FrozenCitadel",
@@ -303,6 +309,7 @@ local GameConfig = {
 				RecommendedPower = 20000,
 				DurationSeconds = 600,
 				BaseGoldReward = 3000000,
+				BlackCrystalReward = 50,
 			},
 			{
 				Id = "VoidFortress",
@@ -311,8 +318,14 @@ local GameConfig = {
 				DurationSeconds = 900,
 				BaseGoldReward = 5000000,
 				GuaranteesEliteTicket = true,
+				BlackCrystalReward = 80,
 			},
 		},
+	},
+
+	-- Toggle raid drops. Wallet still converts leftover Black Crystal after the event.
+	Event = {
+		BlackCrystalRaid = true,
 	},
 
 	Academy = {

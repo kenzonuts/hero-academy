@@ -64,6 +64,7 @@ export type RaidSnapshot = {
 export type PlayerState = {
 	Gold: number,
 	MagicStone: number,
+	BlackCrystal: number,
 	MagicStoneCapacity: number,
 	ConverterLevel: number,
 	RecruitmentLevel: number,
@@ -87,6 +88,7 @@ export type ActionResult = {
 export type PlayerSnapshot = {
 	Gold: number,
 	MagicStone: number,
+	BlackCrystal: number,
 	MagicStoneCapacity: number,
 	ProductionPerSecond: number,
 	ConverterSpeed: number,

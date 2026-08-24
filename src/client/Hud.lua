@@ -14,21 +14,12 @@ local Hud = {}
 
 local ROW_HEIGHT = 28
 local NAV_WIDTH = 400
--- Currency HUD size (scale of the screen). Kecilkan angka Y supaya icon + teks lebih kecil.
-local CURRENCY_WIDTH = 0.52
-local CURRENCY_HEIGHT = 0.032
-local CURRENCY_POS_X = 0.42
-local CURRENCY_POS_Y = 0.05
-local CURRENCY_TEXT_MIN = 10
-local CURRENCY_TEXT_MAX = 20
--- Geser teks Gold relatif ke icon. X lebih besar = lebih ke kanan. Y positif = ke bawah.
-local CURRENCY_TEXT_GAP = -87
-local CURRENCY_TEXT_Y = -2
--- Icon saja (1 = setinggi bar). Naikkan ini tanpa mengubah ukuran angka.
-local CURRENCY_ICON_SCALE = 6.6
--- Lebar tiap chip (coin / kristal). Kecilkan supaya jarak keduanya rapat.
-local CURRENCY_CHIP_WIDTH = 0.26
--- Jarak antar coin dan kristal. 0 = nempel.
+local CURRENCY_WIDTH = 0.22
+local CURRENCY_HEIGHT = 0.20
+local CURRENCY_POS_X = 0.016
+local CURRENCY_POS_Y = 0.975
+local CURRENCY_TEXT_MIN = 14
+local CURRENCY_TEXT_MAX = 26
 local TAB_IDLE = Color3.fromRGB(40, 44, 58)
 local TAB_ON = Color3.fromRGB(50, 105, 180)
 local DISABLED = Color3.fromRGB(70, 70, 80)
@@ -46,6 +37,40 @@ local function fmtInt(value: number): string
 	local raw = tostring(n)
 	local withCommas = raw:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
 	return sign .. withCommas
+end
+
+local function fmtCompact(value: number): string
+	local n = math.floor(value + 0.5)
+	local sign = ""
+	if n < 0 then
+		sign = "-"
+		n = -n
+	end
+	if n < 1000 then
+		return sign .. tostring(n)
+	end
+	local units = {
+		{ 1e12, "T" },
+		{ 1e9, "B" },
+		{ 1e6, "M" },
+		{ 1e3, "K" },
+	}
+	for _, unit in units do
+		local size = unit[1]
+		local suffix = unit[2]
+		if n >= size then
+			local scaled = n / size
+			if scaled >= 100 then
+				return sign .. tostring(math.floor(scaled + 0.5)) .. suffix
+			end
+			local tenths = math.floor(scaled * 10 + 0.5) / 10
+			if tenths == math.floor(tenths) then
+				return sign .. tostring(math.floor(tenths)) .. suffix
+			end
+			return sign .. string.format("%.1f", tenths) .. suffix
+		end
+	end
+	return sign .. tostring(n)
 end
 
 local function addCorner(inst: Instance, radius: number)
@@ -96,105 +121,67 @@ local function makeButton(parent: Instance, name: string, text: string, position
 	return button
 end
 
-local function makeCurrencyChip(
+local function makeCurrencyRow(
 	parent: Instance,
 	name: string,
-	image: string?,
+	image: string,
 	textColor: Color3,
-	strokeColor: Color3
-): (Frame, TextLabel, TextLabel)
-	local chip = Instance.new("Frame")
-	chip.Name = name
-	chip.Size = UDim2.new(0.42, 0, 1, 0)
-	chip.BackgroundTransparency = 1
-	chip.BorderSizePixel = 0
-	chip.ClipsDescendants = false
-	chip.Parent = parent
+	strokeColor: Color3,
+	order: number
+): TextLabel
+	local row = Instance.new("Frame")
+	row.Name = name
+	row.LayoutOrder = order
+	row.Size = UDim2.new(1, 0, 0.3, 0)
+	row.BackgroundTransparency = 1
+	row.BorderSizePixel = 0
+	row.ClipsDescendants = false
+	row.Parent = parent
+
+	local icon = Instance.new("ImageLabel")
+	icon.Name = "Icon"
+	icon.AnchorPoint = Vector2.new(0, 0.5)
+	icon.Position = UDim2.fromScale(0, 0.5)
+	icon.Size = UDim2.fromScale(1, 1)
+	icon.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	icon.BackgroundTransparency = 1
+	icon.BorderSizePixel = 0
+	icon.Image = image
+	icon.ScaleType = Enum.ScaleType.Fit
+	icon.ZIndex = 2
+	icon.Parent = row
 
 	local amount = Instance.new("TextLabel")
 	amount.Name = "Amount"
+	amount.AnchorPoint = Vector2.new(0, 0.5)
 	amount.BackgroundTransparency = 1
 	amount.Font = Enum.Font.GothamBlack
+	amount.Text = "0"
 	amount.TextColor3 = textColor
+	amount.TextScaled = true
 	amount.TextXAlignment = Enum.TextXAlignment.Left
 	amount.TextYAlignment = Enum.TextYAlignment.Center
-	amount.Text = "0"
-	amount.Parent = chip
+	amount.ZIndex = 3
+	amount.Parent = row
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = strokeColor
 	stroke.Thickness = 3.5
-	stroke.Transparency = 0
 	stroke.Parent = amount
+	local textSize = Instance.new("UITextSizeConstraint")
+	textSize.MinTextSize = CURRENCY_TEXT_MIN
+	textSize.MaxTextSize = CURRENCY_TEXT_MAX
+	textSize.Parent = amount
 
-	local rate = Instance.new("TextLabel")
-	rate.Name = "Rate"
-	rate.BackgroundTransparency = 1
-	rate.Font = Enum.Font.GothamBold
-	rate.TextColor3 = textColor
-	rate.TextXAlignment = Enum.TextXAlignment.Left
-	rate.TextYAlignment = Enum.TextYAlignment.Center
-	rate.Text = "+0/s"
-	rate.TextSize = math.max(12, CURRENCY_TEXT_MAX - 4)
-	rate.ZIndex = 3
-	rate.Parent = chip
-	local rateStroke = Instance.new("UIStroke")
-	rateStroke.Color = strokeColor
-	rateStroke.Thickness = 2
-	rateStroke.Transparency = 0
-	rateStroke.Parent = rate
-
-	if image ~= nil and image ~= "" then
-		chip.Size = UDim2.new(CURRENCY_CHIP_WIDTH, 0, 1, 0)
-
-		local iconHolder = Instance.new("Frame")
-		iconHolder.Name = "IconHolder"
-		iconHolder.AnchorPoint = Vector2.new(0, 0.5)
-		iconHolder.BackgroundTransparency = 1
-		iconHolder.BorderSizePixel = 0
-		iconHolder.Position = UDim2.fromScale(0, 0.5)
-		iconHolder.Size = UDim2.fromScale(CURRENCY_ICON_SCALE, CURRENCY_ICON_SCALE)
-		iconHolder.SizeConstraint = Enum.SizeConstraint.RelativeYY
-		iconHolder.ClipsDescendants = false
-		iconHolder.ZIndex = 2
-		iconHolder.Parent = chip
-
-		local icon = Instance.new("ImageLabel")
-		icon.Name = "Icon"
-		icon.BackgroundTransparency = 1
-		icon.BorderSizePixel = 0
-		icon.Size = UDim2.fromScale(1, 1)
-		icon.Image = image
-		icon.ScaleType = Enum.ScaleType.Fit
-		icon.ZIndex = 2
-		icon.Parent = iconHolder
-
-		amount.TextScaled = false
-		amount.TextSize = CURRENCY_TEXT_MAX
-		amount.ZIndex = 3
-
-		local function placeText()
-			local iconWidth = iconHolder.AbsoluteSize.X
-			local textX = iconWidth + CURRENCY_TEXT_GAP
-			amount.Position = UDim2.fromOffset(textX, CURRENCY_TEXT_Y)
-			amount.Size = UDim2.new(1, -textX, 1, 0)
-			rate.Position = UDim2.fromOffset(textX, CURRENCY_TEXT_Y + CURRENCY_TEXT_MAX + 2)
-			rate.Size = UDim2.fromOffset(160, CURRENCY_TEXT_MAX)
-		end
-		iconHolder:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeText)
-		task.defer(placeText)
-	else
-		amount.Position = UDim2.fromScale(0, 0)
-		amount.Size = UDim2.new(1, 0, 0.55, 0)
-		amount.TextScaled = true
-		local textSize = Instance.new("UITextSizeConstraint")
-		textSize.MinTextSize = CURRENCY_TEXT_MIN
-		textSize.MaxTextSize = CURRENCY_TEXT_MAX
-		textSize.Parent = amount
-		rate.Position = UDim2.new(0, 0, 0.55, 0)
-		rate.Size = UDim2.new(1, 0, 0.45, 0)
+	local function placeText()
+		local gap = 8
+		local textX = icon.AbsoluteSize.X + gap
+		amount.Position = UDim2.new(0, textX, 0.5, 0)
+		amount.Size = UDim2.new(1, -textX, 0.9, 0)
 	end
+	icon:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeText)
+	task.defer(placeText)
 
-	return chip, amount, rate
+	return amount
 end
 
 local function makePanel(parent: Instance, name: string, size: UDim2): Frame
@@ -233,7 +220,7 @@ function Hud.Start(remotes: {
 
 	local currencyBar = Instance.new("Frame")
 	currencyBar.Name = "CurrencyBar"
-	currencyBar.AnchorPoint = Vector2.new(0.5, 0)
+	currencyBar.AnchorPoint = Vector2.new(0, 1)
 	currencyBar.Position = UDim2.new(CURRENCY_POS_X, 0, CURRENCY_POS_Y, 0)
 	currencyBar.Size = UDim2.new(CURRENCY_WIDTH, 0, CURRENCY_HEIGHT, 0)
 	currencyBar.BackgroundTransparency = 1
@@ -242,30 +229,37 @@ function Hud.Start(remotes: {
 	currencyBar.Parent = gui
 
 	local currencyLayout = Instance.new("UIListLayout")
-	currencyLayout.FillDirection = Enum.FillDirection.Horizontal
-	currencyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-	currencyLayout.Padding = UDim.new(0, 0)
+	currencyLayout.FillDirection = Enum.FillDirection.Vertical
+	currencyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+	currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+	currencyLayout.Padding = UDim.new(0.04, 0)
 	currencyLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	currencyLayout.Parent = currencyBar
 
-	local stoneChip, stoneAmount, stoneRate = makeCurrencyChip(
+	local blackAmount = makeCurrencyRow(
+		currencyBar,
+		"BlackCrystal",
+		DisplayConfig.BlackCrystalImage(),
+		Color3.fromRGB(235, 235, 240),
+		Color3.fromRGB(12, 12, 16),
+		1
+	)
+	local stoneAmount = makeCurrencyRow(
 		currencyBar,
 		"MagicStone",
 		DisplayConfig.MagicStoneImage(),
 		Color3.fromRGB(220, 90, 210),
-		Color3.fromRGB(255, 245, 255)
+		Color3.fromRGB(255, 245, 255),
+		2
 	)
-	stoneChip.LayoutOrder = 2
-
-	local goldChip, goldAmount, goldRate = makeCurrencyChip(
+	local goldAmount = makeCurrencyRow(
 		currencyBar,
 		"Gold",
 		DisplayConfig.GoldImage(),
 		Color3.fromRGB(255, 215, 55),
-		Color3.fromRGB(20, 35, 80)
+		Color3.fromRGB(20, 35, 80),
+		3
 	)
-	goldChip.LayoutOrder = 1
 
 	local shell = Instance.new("Frame")
 	shell.Name = "HudShell"
@@ -773,19 +767,9 @@ function Hud.Start(remotes: {
 		local recruitLevel = math.max(num(snapshot.RecruitmentLevel), 1)
 		local converterLevel = math.max(num(snapshot.ConverterLevel), 1)
 
-		goldAmount.Text = fmtInt(gold)
-		stoneAmount.Text = fmtInt(num(snapshot.MagicStone))
-		goldRate.Text = string.format("+%s/s", fmtInt(num(snapshot.ConverterSpeed)))
-		local bonusLeft = num(snapshot.ProductionBonusRemaining)
-		if bonusLeft > 0 then
-			stoneRate.Text = string.format(
-				"+%s/s  +20%% %s",
-				fmtInt(num(snapshot.ProductionPerSecond)),
-				formatTime(bonusLeft)
-			)
-		else
-			stoneRate.Text = string.format("+%s/s", fmtInt(num(snapshot.ProductionPerSecond)))
-		end
+		goldAmount.Text = fmtCompact(gold)
+		stoneAmount.Text = fmtCompact(num(snapshot.MagicStone))
+		blackAmount.Text = fmtCompact(num(snapshot.BlackCrystal))
 
 		local recruitCost = snapshot.RecruitmentUpgradeCost
 		if recruitCost == nil then

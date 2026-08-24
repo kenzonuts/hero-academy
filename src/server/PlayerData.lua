@@ -69,6 +69,7 @@ local function newState(): Types.PlayerState
 	return {
 		Gold = GameConfig.Phase1.StartingGold,
 		MagicStone = 0,
+		BlackCrystal = 0,
 		MagicStoneCapacity = GameConfig.Storage.DefaultCapacity,
 		ConverterLevel = 1,
 		RecruitmentLevel = GameConfig.Recruitment.StartingLevel,
@@ -243,6 +244,7 @@ local function decodeState(raw: any, playerId: number): Types.PlayerState?
 	local state: Types.PlayerState = {
 		Gold = clampInt(asNumber(raw.Gold, 0), 0, 1e15),
 		MagicStone = clampInt(asNumber(raw.MagicStone, 0), 0, 1e15),
+		BlackCrystal = clampInt(asNumber(raw.BlackCrystal, 0), 0, 1e15),
 		MagicStoneCapacity = clampInt(asNumber(raw.MagicStoneCapacity, capacity), 1, 1e15),
 		ConverterLevel = clampInt(asNumber(raw.ConverterLevel, 1), 1, maxConverter),
 		RecruitmentLevel = clampInt(asNumber(raw.RecruitmentLevel, 1), 1, maxRecruit),
@@ -291,6 +293,7 @@ function PlayerData.Serialize(state: Types.PlayerState): any
 		v = SAVE_VERSION,
 		Gold = state.Gold,
 		MagicStone = state.MagicStone,
+		BlackCrystal = state.BlackCrystal or 0,
 		MagicStoneCapacity = state.MagicStoneCapacity,
 		ConverterLevel = state.ConverterLevel,
 		RecruitmentLevel = state.RecruitmentLevel,

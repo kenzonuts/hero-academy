@@ -12,7 +12,7 @@ Do not add any of these, even as stubs, placeholders, or “later” features:
 - Evolution (level, material, form, upgrade)
 - Hero Level
 - Hero Loss / Hero Death / extra raid penalty
-- Extra main currencies
+- Extra main currencies (shop gems, cash). Event **Black Crystal** is allowed: raid-only while the event flag is on, converts `1 = 10 Gold`, heroes never produce it.
 - Direct Hero → Gold production
 
 Heroes stay individual. Progression is new recruits, facility upgrades, raids, and optional sell-at-a-loss.

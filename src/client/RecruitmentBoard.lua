@@ -102,7 +102,7 @@ local function makeBottomButton(parent: Instance, name: string, offImage: string
 	local button = Instance.new("ImageButton")
 	button.Name = name
 	button.LayoutOrder = order
-	button.Size = UDim2.new(0.24, 0, 0.82, 0)
+	button.Size = UDim2.new(0.27, 0, 0.92, 0)
 	button.BackgroundTransparency = 1
 	button.BorderSizePixel = 0
 	button.AutoButtonColor = false
@@ -278,7 +278,7 @@ function RecruitmentBoard.Create(
 	grid.Name = "SlotGrid"
 	grid.BackgroundTransparency = 1
 	grid.Position = UDim2.fromScale(0, 0)
-	grid.Size = UDim2.new(1, 0, 0.83, 0)
+	grid.Size = UDim2.new(1, 0, 0.81, 0)
 	grid.ZIndex = 10
 	grid.Parent = left
 
@@ -371,8 +371,8 @@ function RecruitmentBoard.Create(
 	local bottom = Instance.new("Frame")
 	bottom.Name = "Actions"
 	bottom.BackgroundTransparency = 1
-	bottom.Position = UDim2.new(0, 0, 0.845, 0)
-	bottom.Size = UDim2.new(1, 0, 0.14, 0)
+	bottom.Position = UDim2.new(0, 0, 0.86, 0)
+	bottom.Size = UDim2.new(1, 0, 0.16, 0)
 	bottom.ZIndex = 11
 	bottom.Parent = left
 

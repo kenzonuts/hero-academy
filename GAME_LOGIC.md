@@ -13,6 +13,7 @@ Dokumen ini adalah versi master logic. Semua perubahan terakhir sudah digabung, 
 - Recruit Fee; Accept gratis; Hero mahal sangat jarang
 - Pending Candidate
 - Magic Stone → Gold **1:1**
+- Black Crystal (event Raid) → Gold **10:1**
 - Raid maksimal **5 Hero**
 - Sell / Release Hero, refund maksimal **25% nilai katalog Tier**
 - Display `hero` maksimal **40 Hero** total; tidak bisa recruit lagi sampai ada yang di-Sell
@@ -245,14 +246,13 @@ Mendapatkan Hero dengan kombinasi **Tier**, **Power**, dan **Production** yang b
 
 ## 3. Currency & Resource
 
-Game hanya memakai **dua resource utama**:
+Game memakai **Gold** sebagai spend currency, **Magic Stone** dari production Hero, dan **Black Crystal** sebagai drop event Raid.
 
 | Resource | Peran |
 | --- | --- |
 | Gold | Currency utama |
-| Magic Stone | Hasil production Hero |
-
-Tidak memakai banyak jenis currency agar ekonomi tetap mudah dipahami.
+| Magic Stone | Hasil production Hero. Converter 1:1 |
+| Black Crystal | Drop Raid saat event. Converter 1:10. Hero tidak pernah menghasilkan ini |
 
 ---
 
@@ -316,6 +316,20 @@ Tidak ada perubahan rasio. Player **tidak dapat** meng-upgrade:
 - 1 → 10
 
 Yang dapat di-upgrade hanya **kecepatan converter**.
+
+---
+
+## 6b. Black Crystal
+
+Black Crystal hanya didapat dari **Raid sukses** selama `Event.BlackCrystalRaid` aktif. Bukan production Hero. Bukan ticket. Bukan shop gem.
+
+Converter memproses Black Crystal **lebih dulu**, lalu Magic Stone.
+
+```text
+1 Black Crystal = 10 Gold
+```
+
+Jumlah drop per map di `GameConfig.Raid.Maps[].BlackCrystalReward`. Matikan event: `Event.BlackCrystalRaid = false`. Sisa di wallet tetap bisa di-convert.
 
 ---
 

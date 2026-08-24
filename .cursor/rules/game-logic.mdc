@@ -9,9 +9,10 @@ Source of truth: `GAME_LOGIC.md`. Tune example numbers in `src/shared/GameConfig
 
 ## Economy
 
-- Only Gold and Magic Stone.
-- Heroes produce Magic Stone, never Gold.
-- Converter is always `1 Magic Stone = 1 Gold`. Upgrade speed only.
+- Gold is the main spend currency. Heroes produce **Magic Stone**, never Gold.
+- Converter: `1 Magic Stone = 1 Gold`. Upgrade speed only.
+- **Black Crystal** is event-only. Drops from successful Raids while `Event.BlackCrystalRaid` is on. Heroes never produce it. Converter: `1 Black Crystal = 10 Gold` (processed before Magic Stone).
+- No shop gems or extra spend currencies.
 
 ## Recruitment
 
