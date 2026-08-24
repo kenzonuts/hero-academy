@@ -14,12 +14,15 @@ local Hud = {}
 
 local ROW_HEIGHT = 28
 local NAV_WIDTH = 400
-local CURRENCY_WIDTH = 0.22
-local CURRENCY_HEIGHT = 0.20
+local CURRENCY_WIDTH = 0.28
+local CURRENCY_HEIGHT = 0.36
 local CURRENCY_POS_X = 0.016
 local CURRENCY_POS_Y = 0.975
-local CURRENCY_TEXT_MIN = 14
-local CURRENCY_TEXT_MAX = 26
+local CURRENCY_TEXT_MIN = 16
+local CURRENCY_TEXT_MAX = 28
+local CURRENCY_ICON_SCALE = 2.3
+-- Negative = teks nempel/nnumpuk di sisi kanan icon. Lebih negatif = lebih ke kiri.
+local CURRENCY_TEXT_GAP = -0.58
 local TAB_IDLE = Color3.fromRGB(40, 44, 58)
 local TAB_ON = Color3.fromRGB(50, 105, 180)
 local DISABLED = Color3.fromRGB(70, 70, 80)
@@ -132,7 +135,7 @@ local function makeCurrencyRow(
 	local row = Instance.new("Frame")
 	row.Name = name
 	row.LayoutOrder = order
-	row.Size = UDim2.new(1, 0, 0.3, 0)
+	row.Size = UDim2.new(1, 0, 0.28, 0)
 	row.BackgroundTransparency = 1
 	row.BorderSizePixel = 0
 	row.ClipsDescendants = false
@@ -142,7 +145,7 @@ local function makeCurrencyRow(
 	icon.Name = "Icon"
 	icon.AnchorPoint = Vector2.new(0, 0.5)
 	icon.Position = UDim2.fromScale(0, 0.5)
-	icon.Size = UDim2.fromScale(1, 1)
+	icon.Size = UDim2.fromScale(CURRENCY_ICON_SCALE, CURRENCY_ICON_SCALE)
 	icon.SizeConstraint = Enum.SizeConstraint.RelativeYY
 	icon.BackgroundTransparency = 1
 	icon.BorderSizePixel = 0
@@ -173,8 +176,11 @@ local function makeCurrencyRow(
 	textSize.Parent = amount
 
 	local function placeText()
-		local gap = 8
-		local textX = icon.AbsoluteSize.X + gap
+		local iconWidth = icon.AbsoluteSize.X
+		local textX = math.floor(iconWidth * (1 + CURRENCY_TEXT_GAP))
+		if textX < 0 then
+			textX = 0
+		end
 		amount.Position = UDim2.new(0, textX, 0.5, 0)
 		amount.Size = UDim2.new(1, -textX, 0.9, 0)
 	end
@@ -232,7 +238,7 @@ function Hud.Start(remotes: {
 	currencyLayout.FillDirection = Enum.FillDirection.Vertical
 	currencyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 	currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-	currencyLayout.Padding = UDim.new(0.04, 0)
+	currencyLayout.Padding = UDim.new(0.1, 0)
 	currencyLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	currencyLayout.Parent = currencyBar
 
