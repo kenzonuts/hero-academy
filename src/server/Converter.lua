@@ -12,7 +12,15 @@ local Converter = {}
 
 function Converter.GetSpeed(level: number): number
 	local speeds = GameConfig.Converter.SpeedByLevel
-	return speeds[level] or speeds[1] or 0
+	local current = math.floor(level)
+	while current >= 1 do
+		local value = speeds[current]
+		if typeof(value) == "number" then
+			return value
+		end
+		current -= 1
+	end
+	return 10
 end
 
 function Converter.Tick(player: Player, dt: number)

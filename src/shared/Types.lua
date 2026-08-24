@@ -1,7 +1,7 @@
 --!strict
 
 export type CandidateStatus = "PENDING" | "ACCEPTED" | "REJECTED"
-export type HeroStatus = "ACTIVE" | "RAIDING"
+export type HeroStatus = "ACTIVE" | "BAGGED" | "RAIDING"
 export type RaidStatus = "ACTIVE" | "SUCCESS" | "FAILED"
 
 export type Candidate = {
@@ -21,8 +21,44 @@ export type Hero = {
 	Tier: string,
 	Power: number,
 	Production: number,
+	AcceptCost: number,
+	Purchased: boolean,
 	Status: HeroStatus,
+	DisplaySlot: number?,
 	CreatedAt: number,
+}
+
+export type RaidHeroHome = {
+	Status: HeroStatus,
+	DisplaySlot: number?,
+}
+
+export type Raid = {
+	RaidID: string,
+	PlayerID: number,
+	MapID: string,
+	MapName: string,
+	HeroIDs: { string },
+	HeroHomes: { RaidHeroHome },
+	TeamPower: number,
+	RecommendedPower: number,
+	SuccessChance: number,
+	StartTime: number,
+	EndTime: number,
+	Status: RaidStatus,
+}
+
+export type RaidSnapshot = {
+	RaidID: string,
+	MapID: string,
+	MapName: string,
+	HeroIDs: { string },
+	TeamPower: number,
+	RecommendedPower: number,
+	SuccessChance: number,
+	EndTime: number,
+	RemainingSeconds: number,
+	Status: RaidStatus,
 }
 
 export type PlayerState = {
@@ -32,7 +68,14 @@ export type PlayerState = {
 	ConverterLevel: number,
 	RecruitmentLevel: number,
 	PendingCandidate: Candidate?,
+	PendingCandidates: { Candidate },
 	Heroes: { Hero },
+	ActiveRaid: Raid?,
+	RecruitTickets: number,
+	EliteTickets: number,
+	ProductionBonusEndsAt: number,
+	LastRaidMessage: string?,
+	LastRaidOk: boolean?,
 }
 
 export type ActionResult = {
@@ -48,23 +91,27 @@ export type PlayerSnapshot = {
 	ProductionPerSecond: number,
 	ConverterSpeed: number,
 	HeroCount: number,
+	MaxOwnedHeroes: number,
+	ActiveCount: number,
+	BagCount: number,
+	RaidingCount: number,
+	Heroes: { Hero },
 	RecruitmentLevel: number,
+	RecruitmentUpgradeCost: number?,
+	ConverterLevel: number,
+	ConverterUpgradeCost: number?,
+	ConverterNextSpeed: number?,
 	RecruitFee: number,
 	RecruitLocked: boolean,
 	PendingCandidate: Candidate?,
-}
-
-export type Raid = {
-	RaidID: string,
-	PlayerID: number,
-	MapID: string,
-	HeroIDs: { string },
-	TeamPower: number,
-	RecommendedPower: number,
-	SuccessChance: number,
-	StartTime: number,
-	EndTime: number,
-	Status: RaidStatus,
+	PendingCandidates: { Candidate },
+	RecruitTickets: number,
+	EliteTickets: number,
+	ProductionBonusRemaining: number,
+	ActiveRaid: RaidSnapshot?,
+	LastRaidMessage: string?,
+	LastRaidOk: boolean?,
+	AcademyName: string?,
 }
 
 return {}

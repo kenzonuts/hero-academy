@@ -8,13 +8,13 @@
       }
     },
     "ServerScriptService": {
-      "Server": {
+      "HRServer": {
         "$path": "src/server"
       }
     },
     "StarterPlayer": {
       "StarterPlayerScripts": {
-        "Client": {
+        "HRClient": {
           "$path": "src/client"
         }
       }

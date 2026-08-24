@@ -15,7 +15,9 @@ Do not add any of these, even as stubs, placeholders, or “later” features:
 - Extra main currencies
 - Direct Hero → Gold production
 
-Heroes stay individual. Progression is new recruits, facility upgrades, and raids.
+Heroes stay individual. Progression is new recruits, facility upgrades, raids, and optional sell-at-a-loss.
+
+Sell / Release is allowed. Refund is at most 25% of Accept Fee. Do not treat sell as Combine or as raid hero-loss.
 
 ```lua
 -- ❌ BAD

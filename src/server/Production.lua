@@ -1,5 +1,11 @@
 --!strict
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local GameConfig = require(Shared:WaitForChild("GameConfig"))
+
+local Collection = require(script.Parent:WaitForChild("Collection"))
 local Economy = require(script.Parent:WaitForChild("Economy"))
 local PlayerData = require(script.Parent:WaitForChild("PlayerData"))
 
@@ -11,13 +17,13 @@ function Production.GetTotal(player: Player): number
 		return 0
 	end
 
-	local total = 0
-	for _, hero in state.Heroes do
-		if hero.Status == "ACTIVE" then
-			total += hero.Production
-		end
+	local total = Collection.SumActiveProduction(state.Heroes)
+	local endsAt = state.ProductionBonusEndsAt
+	if typeof(endsAt) == "number" and os.time() < endsAt then
+		local bonus = GameConfig.Raid and GameConfig.Raid.ProductionBonus
+		local multiplier = if bonus and typeof(bonus.Multiplier) == "number" then bonus.Multiplier else 1.2
+		total *= multiplier
 	end
-
 	return total
 end
 

@@ -4,18 +4,22 @@
 
 | Field | Value |
 | --- | --- |
-| Version | 1.0 (Master / Final) |
+| Version | 1.2 |
 | Platform | Roblox |
 | Status | Design freeze untuk implementasi |
 
 Dokumen ini adalah versi master logic. Semua perubahan terakhir sudah digabung, termasuk:
 
-- Recruit Fee + Accept Fee
+- Recruit Fee; Accept gratis; Hero mahal sangat jarang
 - Pending Candidate
 - Magic Stone → Gold **1:1**
 - Raid maksimal **5 Hero**
+- Sell / Release Hero, refund maksimal **25% nilai katalog Tier**
+- Display `hero` maksimal **40 Hero** total; tidak bisa recruit lagi sampai ada yang di-Sell
 
 Sistem berikut **tidak dipakai**: Auto Combine, Manual Combine, Fusion, Evolution, Training, Hero Level.
+
+Urutan kerja implementasi: lihat [`PHASES.md`](./PHASES.md).
 
 ---
 
@@ -119,6 +123,12 @@ Sistem berikut **tidak dipakai**: Auto Combine, Manual Combine, Fusion, Evolutio
 96. [Final System Summary](#96-final-system-summary)
 97. [One-Line Game Concept](#97-one-line-game-concept)
 98. [Core Philosophy](#98-core-philosophy)
+99. [Sell / Release Hero](#99-sell--release-hero)
+100. [Sell Refund](#100-sell-refund)
+101. [Sell Restrictions](#101-sell-restrictions)
+102. [Sell Transaction](#102-sell-transaction)
+103. [Sell vs Reject](#103-sell-vs-reject)
+104. [Display Slots & Bag](#104-display-slots--bag)
 
 ---
 
@@ -253,11 +263,9 @@ Gold adalah currency utama dan paling fleksibel.
 Gold digunakan untuk:
 
 - Recruit Hero
-- Accept Candidate
 - Upgrade Hero Recruitment
 - Upgrade Magic Stone Converter
 - Upgrade fasilitas lainnya
-- Sistem progression lain jika diperlukan nanti
 
 ---
 
@@ -356,12 +364,12 @@ Generate Power
        ↓
 Generate Production
        ↓
-Generate Accept Cost
+Generate Catalog Value
        ↓
 Tampilkan Candidate
 ```
 
-**Recruit Fee** dan **Accept Fee** adalah dua transaksi berbeda.
+**Recruit Fee** dibayar untuk roll. **Accept gratis.** Hero mahal jarang muncul.
 
 ---
 
@@ -393,11 +401,11 @@ Aturan Recruit Fee:
 
 ## 10. Accept Fee
 
-Setelah candidate muncul, player harus membayar biaya tambahan untuk benar-benar memiliki Hero.
+Accept **gratis**. Tidak ada Gold tambahan untuk mengambil candidate.
 
-Accept Fee ditentukan berdasarkan **Tier**.
+Nilai katalog per Tier tetap disimpan sebagai `AcceptCost` untuk Sell (refund 25%), bukan untuk ditagih saat Accept.
 
-| Tier | Accept Fee |
+| Tier | Catalog (Sell) |
 | --- | ---: |
 | B1 | 100 Gold |
 | B2 | 250 Gold |
@@ -407,50 +415,33 @@ Accept Fee ditentukan berdasarkan **Tier**.
 | B6 | 10,000 Gold |
 | B7 | 25,000 Gold |
 
-Angka di atas adalah **contoh balancing**. Semakin tinggi Tier, semakin mahal biaya Accept.
-
 ---
 
 ## 11. Recruit Fee vs Accept Fee
 
 Contoh:
 
-Player melakukan Recruit seharga **100 Gold**, lalu mendapatkan:
-
-| Field | Nilai |
-| --- | --- |
-| Tier | B5 |
-| Power | 210 |
-| Production | 115/s |
-| Accept Fee | 4,000 Gold |
-
-Total biaya untuk mendapatkan Hero:
+Player melakukan Recruit seharga **100 Gold**, lalu mendapatkan B5.
 
 ```text
 Recruit Fee   100 Gold
-+ Accept Fee  4,000 Gold
+Accept        FREE
 ────────────────────────
-Total         4,100 Gold
+Total         100 Gold
 ```
 
-Pembayaran tetap dilakukan pada **dua tahap berbeda**.
+Biaya Hero mahal adalah **kesempatan roll yang sangat kecil**, bukan harga Accept.
 
 ---
 
 ## 12. Accept Candidate
 
-Jika Gold player mencukupi:
+Accept **tidak memotong Gold**.
 
 ```text
 Candidate
    ↓
 Player klik ACCEPT
-   ↓
-Check Gold
-   ↓
-Gold cukup
-   ↓
-Kurangi Accept Fee
    ↓
 Candidate menjadi Hero
    ↓
@@ -472,7 +463,7 @@ Deleted
 ```
 
 - Recruit Fee tetap hangus
-- Accept Fee tidak dibayar
+- Accept tidak memotong Gold
 
 Contoh:
 
@@ -489,31 +480,15 @@ Player harus Recruit lagi jika ingin mencari kandidat baru.
 
 ## 14. Insufficient Accept Gold
 
-Jika player mendapatkan Hero yang bagus tetapi Gold tidak cukup untuk Accept, **candidate tidak hilang**.
+Tidak dipakai. Accept gratis, jadi kekurangan Gold tidak menahan Accept.
 
-Candidate disimpan sebagai **Pending Candidate**.
-
-Contoh:
-
-| Item | Nilai |
-| --- | --- |
-| Candidate | B5 |
-| Accept Cost | 4,000 Gold |
-| Player Gold | 1,250 Gold |
-
-```text
-Candidate
-    ↓
-SAVE
-    ↓
-📦 PENDING CANDIDATE
-```
+Pending Candidate tetap ada sampai TAKE ALL / CLEAR ALL, atau board penuh (maks 10 kartu).
 
 ---
 
 ## 15. Pending Candidate
 
-Pending Candidate adalah candidate yang sudah dihasilkan tetapi belum dibayar Accept Fee.
+Pending Candidate adalah candidate yang sudah di-roll tetapi belum di-Accept atau Reject.
 
 Candidate tetap tersimpan sampai:
 
@@ -534,25 +509,28 @@ Default:
 
 ## 16. Pending Candidate Limit
 
-Untuk menjaga ekonomi dan mencegah spam, player hanya dapat memiliki **1 Pending Candidate aktif**.
+Untuk menjaga ekonomi, board menampung maksimal **10 Pending Candidate**.
+
+Recruit 1X / 5X / 10X hanya mengisi slot kosong. Kalau slot atau roster 40 penuh, pull ditolak. TAKE ALL = Accept semua. CLEAR ALL = Reject semua (fee hangus).
 
 ```text
-Recruitment Center
+Recruit 1X / 5X / 10X
       ↓
-Check Pending Candidate
-      ↓
-Ada Candidate?
+Empty slots on the board?
       │
-      ├── YES
+      ├── NO (pending + pull > 10)
       │    ↓
-      │ Recruitment dikunci
+      │ Pull ditolak — TAKE ALL atau CLEAR ALL dulu
       │
-      └── NO
+      └── YES
            ↓
-        Recruit
+      Heroes + pending + pull ≤ 40?
+           │
+           ├── NO → pull ditolak, jual Hero dulu
+           └── YES → bayar fee × jumlah, isi slot kosong
 ```
 
-Player harus menyelesaikan Candidate tersebut terlebih dahulu.
+Kartu baru tetap tertutup sampai OPEN ALL. TAKE ALL = Accept semua. CLEAR ALL = Reject semua (fee hangus).
 
 ---
 
@@ -701,20 +679,25 @@ Hero yang tidak sedang digunakan untuk Raid berada di area display.
 🦸       🦸
 ```
 
-Hero di display menghasilkan Magic Stone.
+Hero di display muncul di pad **hero**. Maksimal **40 Hero** di panggung.
+
+Kalau display penuh, Hero baru hasil Accept masuk **Tas** (`BAGGED`), bukan ke pad.
+
+Hero di display dan di Tas tetap menghasilkan Magic Stone. Hanya status `RAIDING` yang menjeda production.
 
 ---
 
 ## 24. Hero Production State
 
-Hero memiliki dua status:
+Hero memiliki tiga status:
 
 | Status | Lokasi | Production |
 | --- | --- | --- |
-| `ACTIVE` | Display | Aktif |
+| `ACTIVE` | Pad `hero` (maks 40) | Aktif |
+| `BAGGED` | Tas | Aktif |
 | `RAIDING` | Raid | Dijeda |
 
-Hero hanya menghasilkan Magic Stone jika statusnya `ACTIVE`.
+Hero menghasilkan Magic Stone jika statusnya `ACTIVE` atau `BAGGED`.
 
 ---
 
@@ -833,35 +816,45 @@ Angka berikut adalah **contoh balancing**.
 
 | Tier | Chance |
 | --- | ---: |
-| B1 | 70% |
-| B2 | 30% |
+| B1 | 93% |
+| B2 | 7% |
 
 ### Recruitment Level 2
 
 | Tier | Chance |
 | --- | ---: |
-| B1 | 50% |
-| B2 | 40% |
-| B3 | 10% |
+| B1 | 85% |
+| B2 | 14% |
+| B3 | 1% |
 
 ### Recruitment Level 3
 
 | Tier | Chance |
 | --- | ---: |
-| B1 | 35% |
-| B2 | 40% |
-| B3 | 20% |
-| B4 | 5% |
+| B1 | 80% |
+| B2 | 16% |
+| B3 | 3% |
+| B4 | 1% |
+
+### Recruitment Level 4
+
+| Tier | Chance |
+| --- | ---: |
+| B1 | 76% |
+| B2 | 20% |
+| B3 | 3% |
+| B4 | 0.9% |
+| B5 | 0.1% |
 
 ### Recruitment Level 5
 
 | Tier | Chance |
 | --- | ---: |
-| B1 | 15% |
-| B2 | 30% |
-| B3 | 30% |
-| B4 | 20% |
-| B5 | 5% |
+| B1 | 68% |
+| B2 | 23% |
+| B3 | 7% |
+| B4 | 1.8% |
+| B5 | 0.2% |
 
 ---
 
@@ -944,6 +937,10 @@ Contoh:
 | B5 Knight | 210 | 113/s |
 
 Tidak ada batas combine. Jumlah Hero dapat bertambah selama player memperoleh dan menerima Candidate.
+
+Display world hanya menampung **40 Hero** di aset `hero`. Sisanya masuk Tas. Lihat seksi 104.
+
+Player dapat merapikan koleksi dengan **Sell / Release**. Itu bukan Combine. Lihat seksi 99–103.
 
 ---
 
@@ -1102,9 +1099,19 @@ Hero:
 
 ## 48. Raid Timer
 
-Setiap map memiliki durasi.
+Timer map adalah **durasi maksimal**. Power party yang lebih tinggi bisa mempercepat Raid.
 
-| Map | Duration |
+```text
+Power Ratio = Team Power / Recommended Power
+```
+
+- Ratio **<= 1.0** → durasi penuh
+- Ratio **1.0 → 1.5** → semakin cepat, turun ke 50% durasi
+- Ratio **>= 1.5** → lantai **50%** durasi (tidak lebih cepat)
+
+Durasi dikunci saat START RAID.
+
+| Map | Durasi maks |
 | --- | --- |
 | Whispering Forest | 3 menit |
 | Desert Ruins | 5 menit |
@@ -1292,7 +1299,7 @@ Contoh:
 Use: FREE RECRUIT
 ```
 
-**Accept Fee tetap berlaku.**
+**Accept tetap gratis.** Ticket hanya menghapus Recruit Fee.
 
 Contoh:
 
@@ -1300,9 +1307,7 @@ Contoh:
 | --- | --- |
 | Recruit Fee | FREE |
 | Candidate | B5 |
-| Accept Fee | 4,000 Gold |
-
-Ticket hanya menghapus Recruit Fee. Accept Fee tetap harus dibayar.
+| Accept | FREE |
 
 ---
 
@@ -1319,7 +1324,7 @@ Contoh:
 | Minimum | B3+ |
 | Possible | B3, B4, B5, B6 |
 
-Accept Fee tetap berlaku berdasarkan Tier candidate.
+Accept tetap gratis.
 
 ---
 
@@ -1423,6 +1428,8 @@ Gold digunakan untuk:
   └── Converter Upgrade
 ```
 
+Gold juga bisa kembali sedikit dari **Sell Hero** (maksimal 25% Accept Fee). Recruit Fee tidak pernah kembali.
+
 Gold diperoleh dari:
 
 ```text
@@ -1435,6 +1442,10 @@ Gold diperoleh dari:
 ⚔️ RAID
       ↓
 🎁 GOLD REWARD
+
+🦸 SELL HERO
+      ↓
+🪙 25% ACCEPT FEE
 ```
 
 ---
@@ -1634,22 +1645,21 @@ Accept Candidate
 
 ## 72. Pending Candidate Restriction
 
-Selama Pending Candidate masih ada, **Recruit Button = LOCKED**.
+Recruit 1X / 5X / 10X terkunci hanya jika board penuh (10 kartu) atau roster + pending tidak muat 40.
 
 ```text
 ┌────────────────────────────┐
 │ RECRUITMENT                │
 │                            │
-│ ⚠️ Pending Candidate       │
+│ ⚠️ Board penuh (10/10)     │
+│    atau roster hampir cap  │
 │                            │
-│ Accept your current        │
-│ candidate first.           │
-│                            │
-│ [ VIEW CANDIDATE ]         │
+│ TAKE ALL / CLEAR ALL       │
+│ atau jual Hero dulu.       │
 └────────────────────────────┘
 ```
 
-Ini mencegah player memiliki banyak Candidate yang belum dibayar.
+Board boleh berisi sampai 10 kartu sekaligus. Recruit hanya ditolak kalau slot atau roster tidak cukup.
 
 ---
 
@@ -1735,7 +1745,10 @@ Minimal Hero harus memiliki:
 | `Tier` | Rarity |
 | `Power` | Stat Raid |
 | `Production` | Stat Magic Stone /s |
-| `Status` | `ACTIVE` / `RAIDING` |
+| `AcceptCost` | Accept Fee yang dibayar (0 jika seed / tidak dibeli) |
+| `Purchased` | `true` jika player membayar Accept Fee |
+| `Status` | `ACTIVE` / `BAGGED` / `RAIDING` |
+| `DisplaySlot` | Nomor pad 1–40 jika `ACTIVE`, selain itu kosong |
 | `CreatedAt` | Waktu dibuat |
 
 ---
@@ -1992,6 +2005,7 @@ Setiap Hero berdiri sendiri.
 ```text
 💎 Magic Stone → ⚙️ Converter → 🪙 Gold
 ⚔️ Raid → 🎁 Gold Reward
+🦸 Sell Hero → 🪙 25% Accept Fee
 ```
 
 ### Gold Sink
@@ -2000,7 +2014,6 @@ Setiap Hero berdiri sendiri.
 🪙 Gold
  │
  ├── Recruit Fee
- ├── Accept Fee
  ├── Recruitment Upgrade
  └── Converter Upgrade
 ```
@@ -2175,26 +2188,36 @@ Sistem berikut secara resmi **tidak digunakan**:
 - Stat tidak berubah
 - Tidak ada reroll
 - Tidak ada expiration
-- Maksimal 1 Pending Candidate
-- Recruitment baru terkunci selama Pending Candidate aktif
+- Maksimal 10 Pending Candidate di Recruitment Board
+- Recruit 1X / 5X / 10X mengisi slot kosong
+- TAKE ALL menerima semua kartu; CLEAR ALL menolak semua
 - Setelah Gold cukup, player dapat Accept
 
 ### 🦸 Hero
 
 - Hero langsung aktif setelah Accept
 - Hero memiliki Tier, Power, Production
-- Hero dapat dipajang
-- Hero menghasilkan Magic Stone
+- Hero dapat dipajang di `hero` (maks 40)
+- Kelebihan Accept masuk Tas (`BAGGED`)
+- Hero `ACTIVE` dan `BAGGED` menghasilkan Magic Stone
 - Hero dapat dikirim Raid
+- Hero yang dibeli dapat di-Sell / Release dengan refund maksimal 25% Accept Fee
+
+### 💰 Sell / Release
+
+- Harga beli = Accept Fee yang terkunci saat Accept
+- Refund maksimal **25%** Accept Fee, dibulatkan ke bawah
+- Recruit Fee tidak dikembalikan
+- Hero `RAIDING` tidak bisa dijual
+- Seed / starter Hero tidak bisa dijual
+- Sell menghapus Hero dari koleksi, display, dan production
 
 ### 💎 Magic Stone
 
-- Dihasilkan Hero
+- Dihasilkan Hero `ACTIVE` (display) dan `BAGGED` (tas)
 - Disimpan di Storage
 - Tidak langsung menjadi Gold
 - Diproses oleh Converter
-
-### ⚙️ Converter
 
 - Mengubah Magic Stone menjadi Gold
 - Ratio **1:1**
@@ -2254,6 +2277,8 @@ Gameplay harus terus menciptakan keputusan:
         ↓
 "Hero ini lebih bagus buat farming atau Raid?"
         ↓
+"Kalau jelek, jual rugi. Cuma 25% Accept Fee yang balik."
+        ↓
 "Kalau gue kirim Raid, production gue berhenti."
         ↓
 "Tapi reward Raid besar."
@@ -2276,3 +2301,143 @@ Tujuan akhirnya adalah menciptakan loop:
 ```text
 RECRUIT → JUDGE → SAVE/ACCEPT → COLLECT → PRODUCE → CONVERT → INVEST → RAID → REWARD → RECRUIT AGAIN
 ```
+
+Sell adalah cabang opsional dari COLLECT: buang Hero jelek, terima rugi 75%+ Accept Fee.
+
+---
+
+## 99. Sell / Release Hero
+
+Sell / Release dipakai untuk merapikan koleksi. Ini **bukan** Combine, Fusion, atau Hero Loss karena Raid.
+
+```text
+HERO (ACTIVE)
+   ↓
+Player pilih SELL
+   ↓
+Check boleh dijual?
+   ├── NO → transaksi batal
+   └── YES
+        ↓
+     Bayar refund 25% Accept Fee
+        ↓
+     Hapus Hero
+        ↓
+     Production dan Display update
+```
+
+Tujuan: player tidak stuck dengan tumpukan Hero roll jelek, tapi tetap rugi kalau jual.
+
+---
+
+## 100. Sell Refund
+
+Refund dihitung **hanya dari Accept Fee**. Recruit Fee tidak masuk harga beli.
+
+```text
+Refund = floor(AcceptCost × 0.25)
+```
+
+`0.25` adalah **maksimal**. Tidak ada bonus di atas 25%.
+
+Contoh B2:
+
+| Item | Gold |
+| --- | ---: |
+| Recruit Fee | 100 (hangus, tidak dihitung) |
+| Accept Fee / harga beli | 250 |
+| Refund jual | 62 |
+| Rugi | 288 |
+
+Contoh B5:
+
+| Item | Gold |
+| --- | ---: |
+| Recruit Fee | 100 (hangus) |
+| Accept Fee | 4,000 |
+| Refund jual | 1,000 |
+
+`AcceptCost` dikunci saat Accept. Kalau tabel Accept Fee di-balance ulang nanti, Hero lama tetap memakai biaya yang dulu dibayar.
+
+---
+
+## 101. Sell Restrictions
+
+Hero **tidak bisa** dijual jika:
+
+| Kondisi | Alasan |
+| --- | --- |
+| `Status == RAIDING` | Hero sedang di Raid |
+| `Purchased == false` | Seed / starter, tidak dibeli |
+| Hero tidak milik player | Validasi server |
+| Candidate Pending | Candidate memakai Reject, bukan Sell |
+
+Tidak ada jual cicilan. Tidak ada jual sebagian stat. Satu transaksi = satu Hero dihapus.
+
+---
+
+## 102. Sell Transaction
+
+```text
+Check Hero Exists
+        ↓
+Check Hero milik player
+        ↓
+Check Purchased == true
+        ↓
+Check Status != RAIDING
+        ↓
+Refund = floor(AcceptCost × 0.25)
+        ↓
+Add Gold
+        ↓
+Remove Hero from Collection
+        ↓
+Remove from Display
+        ↓
+Recalculate Production
+```
+
+Jika salah satu check gagal: Gold tidak berubah, Hero tetap ada.
+
+---
+
+## 103. Sell vs Reject
+
+| Aksi | Objek | Recruit Fee | Accept Fee | Hasil |
+| --- | --- | --- | --- | --- |
+| Reject | Candidate | Hangus | Tidak dibayar | Candidate hilang |
+| Sell | Hero | Hangus | Sudah dibayar, 25% kembali | Hero hilang |
+
+Reject sebelum punya Hero. Sell setelah punya Hero. Keduanya bukan Combine.
+
+---
+
+## 104. Display Slots & Bag
+
+Aset panggung di Workspace bernama **hero** (folder `hero`).
+
+Aturan:
+
+- Maksimal **40** Hero tampil di pad `hero` (`ACTIVE`)
+- Setiap Hero display punya **slot tetap** (pad 1–40). Jual Hero di pad itu → pad itu **kosong**
+- Hero lain **tidak bergeser** mengisi pad kosong
+- Hero Tas **tidak** otomatis naik ke pad kosong
+- Accept baru boleh mengisi pad kosong pertama. Kalau semua pad terisi, masuk Tas
+- `RAIDING` keluar dari pad dan production dijeda; pad yang ditinggal tetap kosong
+- Seed / starter Hero mulai di pad 1, 2, dst.
+
+```text
+ACCEPT HERO
+   ↓
+Ada pad kosong?
+   ├── YES → Status ACTIVE, kunci ke pad itu
+   └── NO  → Status BAGGED → masuk Tas
+
+SELL HERO DI PAD 3
+   ↓
+Pad 3 kosong
+Hero di pad lain tetap di pad-nya
+```
+
+
