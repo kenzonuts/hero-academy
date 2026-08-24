@@ -26,7 +26,7 @@ local CLOSE_SIZE = 40
 local CLOSE_POS = UDim2.new(1, -10, 0, 14)
 local FLIP_HALF = 0.12
 
-local function fmtInt(value: number): string
+local function fmtCompact(value: number): string
 	local n = math.floor(value + 0.5)
 	local sign = ""
 	if n < 0 then
@@ -36,13 +36,28 @@ local function fmtInt(value: number): string
 	if n < 1000 then
 		return sign .. tostring(n)
 	end
-	local parts = {}
-	while n >= 1000 do
-		table.insert(parts, 1, string.format("%03d", n % 1000))
-		n = math.floor(n / 1000)
+	local units = {
+		{ 1e12, "T" },
+		{ 1e9, "B" },
+		{ 1e6, "M" },
+		{ 1e3, "K" },
+	}
+	for _, unit in units do
+		local size = unit[1]
+		local suffix = unit[2]
+		if n >= size then
+			local scaled = n / size
+			if scaled >= 100 then
+				return sign .. tostring(math.floor(scaled + 0.5)) .. suffix
+			end
+			local tenths = math.floor(scaled * 10 + 0.5) / 10
+			if tenths == math.floor(tenths) then
+				return sign .. tostring(math.floor(tenths)) .. suffix
+			end
+			return sign .. string.format("%.1f", tenths) .. suffix
+		end
 	end
-	table.insert(parts, 1, tostring(n))
-	return sign .. table.concat(parts, ",")
+	return sign .. tostring(n)
 end
 
 export type BoardHandle = {
@@ -137,22 +152,28 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	local costRow = Instance.new("Frame")
 	costRow.Name = "Cost"
 	costRow.BackgroundTransparency = 1
-	costRow.Position = UDim2.fromScale(0, 0)
-	costRow.Size = UDim2.fromScale(1, 1)
+	costRow.Position = UDim2.new(0.12, 0, 0.16, 0)
+	costRow.Size = UDim2.new(0.76, 0, 0.68, 0)
 	costRow.ZIndex = 12
 	costRow.Parent = button
+	local costPad = Instance.new("UIPadding")
+	costPad.PaddingLeft = UDim.new(0.04, 0)
+	costPad.PaddingRight = UDim.new(0.04, 0)
+	costPad.PaddingTop = UDim.new(0.08, 0)
+	costPad.PaddingBottom = UDim.new(0.08, 0)
+	costPad.Parent = costRow
 
 	local layout = Instance.new("UIListLayout")
 	layout.FillDirection = Enum.FillDirection.Horizontal
 	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	layout.VerticalAlignment = Enum.VerticalAlignment.Center
-	layout.Padding = UDim.new(0, 6)
+	layout.Padding = UDim.new(0, 4)
 	layout.Parent = costRow
 
 	local coin = Instance.new("ImageLabel")
 	coin.Name = "Coin"
 	coin.BackgroundTransparency = 1
-	coin.Size = UDim2.fromScale(0.28, 0.72)
+	coin.Size = UDim2.fromScale(0.2, 0.72)
 	coin.Image = DisplayConfig.RecruitmentGoldImage()
 	coin.ScaleType = Enum.ScaleType.Fit
 	coin.ZIndex = 12
@@ -164,14 +185,18 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	local amount = Instance.new("TextLabel")
 	amount.Name = "Amount"
 	amount.BackgroundTransparency = 1
-	amount.Size = UDim2.new(0.55, 0, 0.78, 0)
+	amount.Size = UDim2.new(0.7, 0, 0.9, 0)
 	amount.Font = Enum.Font.GothamBold
-	amount.Text = fmtInt(cost)
+	amount.Text = fmtCompact(cost)
 	amount.TextColor3 = Color3.new(1, 1, 1)
 	amount.TextScaled = true
 	amount.TextXAlignment = Enum.TextXAlignment.Left
 	amount.ZIndex = 12
 	amount.Parent = costRow
+	local amountSize = Instance.new("UITextSizeConstraint")
+	amountSize.MinTextSize = 10
+	amountSize.MaxTextSize = 22
+	amountSize.Parent = amount
 
 	return button
 end
@@ -523,7 +548,7 @@ function RecruitmentBoard.Create(
 		end
 		local amount = costRow:FindFirstChild("Amount")
 		if amount and amount:IsA("TextLabel") then
-			amount.Text = fmtInt(cost)
+			amount.Text = fmtCompact(cost)
 		end
 	end
 
