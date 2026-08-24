@@ -50,7 +50,7 @@ local function makeHero(seed: { HeroType: string, Tier: string, Power: number, P
 		Tier = seed.Tier,
 		Power = seed.Power,
 		Production = seed.Production,
-		AcceptCost = 0,
+		AcceptCost = GameConfig.CatalogAcceptCost(seed.Tier),
 		Purchased = false,
 		Status = "ACTIVE",
 		DisplaySlot = nil,
@@ -112,6 +112,10 @@ local function decodeHero(raw: any): Types.Hero?
 		DisplaySlot = displaySlot,
 		CreatedAt = clampInt(asNumber(raw.CreatedAt, os.time()), 0, 4e9),
 	}
+	if hero.AcceptCost <= 0 then
+		hero.AcceptCost = GameConfig.CatalogAcceptCost(hero.Tier)
+	end
+	return hero
 end
 
 local function decodeCandidate(raw: any): Types.Candidate?

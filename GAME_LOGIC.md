@@ -1745,8 +1745,8 @@ Minimal Hero harus memiliki:
 | `Tier` | Rarity |
 | `Power` | Stat Raid |
 | `Production` | Stat Magic Stone /s |
-| `AcceptCost` | Accept Fee yang dibayar (0 jika seed / tidak dibeli) |
-| `Purchased` | `true` jika player membayar Accept Fee |
+| `AcceptCost` | Catalog value locked at Accept or starter grant |
+| `Purchased` | `true` if accepted from the board; `false` for starters |
 | `Status` | `ACTIVE` / `BAGGED` / `RAIDING` |
 | `DisplaySlot` | Nomor pad 1–40 jika `ACTIVE`, selain itu kosong |
 | `CreatedAt` | Waktu dibuat |
@@ -2201,7 +2201,7 @@ Sistem berikut secara resmi **tidak digunakan**:
 - Kelebihan Accept masuk Tas (`BAGGED`)
 - Hero `ACTIVE` dan `BAGGED` menghasilkan Magic Stone
 - Hero dapat dikirim Raid
-- Hero yang dibeli dapat di-Sell / Release dengan refund maksimal 25% Accept Fee
+- Hero yang dibeli atau starter dapat di-Sell / Release dengan refund maksimal 25% catalog Accept Fee
 
 ### 💰 Sell / Release
 
@@ -2209,7 +2209,7 @@ Sistem berikut secara resmi **tidak digunakan**:
 - Refund maksimal **25%** Accept Fee, dibulatkan ke bawah
 - Recruit Fee tidak dikembalikan
 - Hero `RAIDING` tidak bisa dijual
-- Seed / starter Hero tidak bisa dijual
+- Seed / starter Hero bisa dijual; refund 25% dari catalog tier yang dikunci saat grant
 - Sell menghapus Hero dari koleksi, display, dan production
 
 ### 💎 Magic Stone
@@ -2368,7 +2368,6 @@ Hero **tidak bisa** dijual jika:
 | Kondisi | Alasan |
 | --- | --- |
 | `Status == RAIDING` | Hero sedang di Raid |
-| `Purchased == false` | Seed / starter, tidak dibeli |
 | Hero tidak milik player | Validasi server |
 | Candidate Pending | Candidate memakai Reject, bukan Sell |
 
@@ -2382,8 +2381,6 @@ Tidak ada jual cicilan. Tidak ada jual sebagian stat. Satu transaksi = satu Hero
 Check Hero Exists
         ↓
 Check Hero milik player
-        ↓
-Check Purchased == true
         ↓
 Check Status != RAIDING
         ↓

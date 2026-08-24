@@ -17,7 +17,7 @@ local GameConfig = {
 	Sell = {
 		RefundPercent = 0.25,
 		RecruitFeeRefunded = false,
-		AllowSeedHeroSell = false,
+		AllowSeedHeroSell = true,
 		BlockIfRaiding = true,
 	},
 
@@ -322,5 +322,18 @@ local GameConfig = {
 		KickMessage = "Server penuh. Maksimal 6 player (1 akademi per orang).",
 	},
 }
+
+function GameConfig.CatalogAcceptCost(tier: string): number
+	local recruitment = GameConfig.Recruitment
+	local fees = recruitment and recruitment.AcceptFeeByTier
+	if typeof(fees) ~= "table" then
+		return 0
+	end
+	local value = (fees :: any)[tier]
+	if typeof(value) == "number" and value > 0 then
+		return math.floor(value)
+	end
+	return 0
+end
 
 return GameConfig

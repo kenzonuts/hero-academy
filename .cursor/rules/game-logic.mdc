@@ -25,7 +25,7 @@ Source of truth: `GAME_LOGIC.md`. Tune example numbers in `src/shared/GameConfig
 
 - Catalog value by tier is locked at Accept as `AcceptCost` (not charged).
 - Refund is `floor(AcceptCost * 0.25)` Gold. That 25% is the maximum.
-- Seed / unpurchased Heroes cannot be sold. `RAIDING` Heroes cannot be sold.
+- Seed / starter Heroes can be sold. Refund is `floor(AcceptCost * 0.25)` of the tier catalog locked at grant. `RAIDING` Heroes cannot be sold.
 - Sell is not Combine. Implement in Phase 4 (`PHASES.md`).
 
 ## Display

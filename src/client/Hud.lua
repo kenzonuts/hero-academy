@@ -646,11 +646,19 @@ function Hud.Start(remotes: {
 
 
 	local function sellRefund(hero: Types.Hero): number?
-		if not hero.Purchased or hero.Status == "RAIDING" then
+		if hero.Status == "RAIDING" then
+			return nil
+		end
+		local allowSeed = GameConfig.Sell and GameConfig.Sell.AllowSeedHeroSell == true
+		if not hero.Purchased and not allowSeed then
 			return nil
 		end
 		local percent = (GameConfig.Sell and GameConfig.Sell.RefundPercent) or 0.25
-		return math.floor(hero.AcceptCost * percent)
+		local cost = hero.AcceptCost
+		if cost <= 0 then
+			cost = GameConfig.CatalogAcceptCost(hero.Tier)
+		end
+		return math.floor(cost * percent)
 	end
 
 	local function selectedHero(): Types.Hero?
@@ -674,7 +682,7 @@ function Hud.Start(remotes: {
 		end
 		local refund = sellRefund(hero)
 		if refund == nil then
-			sellButton.Text = if hero.Purchased then "Cannot sell (Raid)" else "Starter — cannot sell"
+			sellButton.Text = "Cannot sell (Raid)"
 			sellButton.BackgroundColor3 = DISABLED
 			return
 		end

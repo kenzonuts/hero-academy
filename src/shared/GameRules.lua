@@ -10,7 +10,7 @@
 ]]
 
 local GameRules = {
-	Version = "1.4",
+	Version = "1.5",
 	Loop = "RECRUIT → JUDGE → SAVE/ACCEPT → COLLECT → PRODUCE → CONVERT → INVEST → RAID → REWARD",
 
 	Currencies = {
@@ -25,8 +25,7 @@ local GameRules = {
 		"Recruit Fee is never refunded, even on Reject or Sell.",
 		"High-tier Heroes are rare. Rarity is the cost of a free Accept.",
 		"Sell refund is floor(AcceptCost * 0.25) of the tier catalog value locked at Accept. This is a maximum.",
-		"Seed / unpurchased Heroes cannot be sold.",
-		"RAIDING Heroes cannot be sold.",
+		"Seed / starter Heroes can be sold. Refund uses the tier catalog locked as AcceptCost. RAIDING Heroes cannot be sold.",
 		"Maximum 10 pending cards on the Recruitment Board. Recruit 1X / 5X / 10X fill empty slots. TAKE ALL accepts, CLEAR ALL rejects.",
 		"Pending candidates do not expire, mutate, or reroll.",
 		"Candidate stats are locked at generation.",

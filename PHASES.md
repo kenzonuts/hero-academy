@@ -24,9 +24,9 @@ Facility upgrades adalah **Phase 5** (selesai). Raid adalah **Phase 6** (selesai
 
 Selesai kalau:
 
-- Tombol Sell hanya pada Hero `Purchased == true` dan status bukan `RAIDING`
+- Tombol Sell pada Hero yang statusnya bukan `RAIDING`
 - Refund = `floor(AcceptCost × 0.25)` Gold, Recruit Fee tidak kembali
-- Seed / starter Hero tidak bisa dijual
+- Seed / starter Hero bisa dijual (catalog tier, sama 25%)
 - Hero `RAIDING` tidak bisa dijual
 - Setelah jual: Hero hilang dari koleksi + display, production turun
 - Transaksi gagal tidak mengubah Gold

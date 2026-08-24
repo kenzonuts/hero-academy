@@ -170,7 +170,11 @@ function Collection.GetSellRefund(hero: Types.Hero): number?
 	end
 
 	local percent = (GameConfig.Sell and GameConfig.Sell.RefundPercent) or 0.25
-	return math.floor(hero.AcceptCost * percent)
+	local cost = hero.AcceptCost
+	if cost <= 0 then
+		cost = GameConfig.CatalogAcceptCost(hero.Tier)
+	end
+	return math.floor(cost * percent)
 end
 
 return Collection
