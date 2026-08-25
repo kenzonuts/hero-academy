@@ -15,12 +15,12 @@ local Hud = {}
 local ROW_HEIGHT = 28
 local NAV_WIDTH = 400
 local CURRENCY_WIDTH = 0.28
-local CURRENCY_HEIGHT = 0.36
-local CURRENCY_POS_X = 0.016
-local CURRENCY_POS_Y = 0.975
+local CURRENCY_HEIGHT = 0.28
+local CURRENCY_POS_X = 0.008
+local CURRENCY_POS_Y = 0.995
 local CURRENCY_TEXT_MIN = 16
 local CURRENCY_TEXT_MAX = 28
-local CURRENCY_ICON_SCALE = 2.3
+local CURRENCY_ICON_SCALE = 2.55
 -- Negative = teks nempel/nnumpuk di sisi kanan icon. Lebih negatif = lebih ke kiri.
 local CURRENCY_TEXT_GAP = -0.58
 local TAB_IDLE = Color3.fromRGB(40, 44, 58)
@@ -135,7 +135,7 @@ local function makeCurrencyRow(
 	local row = Instance.new("Frame")
 	row.Name = name
 	row.LayoutOrder = order
-	row.Size = UDim2.new(1, 0, 0.28, 0)
+	row.Size = UDim2.new(1, 0, 0.24, 0)
 	row.BackgroundTransparency = 1
 	row.BorderSizePixel = 0
 	row.ClipsDescendants = false
@@ -231,14 +231,14 @@ function Hud.Start(remotes: {
 	currencyBar.Size = UDim2.new(CURRENCY_WIDTH, 0, CURRENCY_HEIGHT, 0)
 	currencyBar.BackgroundTransparency = 1
 	currencyBar.ClipsDescendants = false
-	currencyBar.ZIndex = 20
+	currencyBar.ZIndex = 30
 	currencyBar.Parent = gui
 
 	local currencyLayout = Instance.new("UIListLayout")
 	currencyLayout.FillDirection = Enum.FillDirection.Vertical
 	currencyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-	currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-	currencyLayout.Padding = UDim.new(0.1, 0)
+	currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+	currencyLayout.Padding = UDim.new(0.02, 0)
 	currencyLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	currencyLayout.Parent = currencyBar
 
@@ -266,6 +266,53 @@ function Hud.Start(remotes: {
 		Color3.fromRGB(20, 35, 80),
 		3
 	)
+
+	local blackRow = blackAmount.Parent :: Frame
+	local stoneRow = stoneAmount.Parent :: Frame
+	local goldRow = goldAmount.Parent :: Frame
+
+	local function applyRowIconScale(row: Frame, scale: number)
+		local icon = row:FindFirstChild("Icon")
+		if icon and icon:IsA("ImageLabel") then
+			icon.Size = UDim2.fromScale(scale, scale)
+		end
+	end
+
+	local function setCurrencyDocked(onBoard: boolean)
+		if onBoard then
+			currencyBar.AnchorPoint = Vector2.new(0, 0)
+			currencyBar.Position = UDim2.new(0.02, 0, 0.012, 0)
+			currencyBar.Size = UDim2.new(0.22, 0, 0.085, 0)
+			currencyLayout.FillDirection = Enum.FillDirection.Horizontal
+			currencyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			currencyLayout.Padding = UDim.new(0, 0)
+			stoneRow.Visible = false
+			blackRow.Visible = false
+			goldRow.Visible = true
+			goldRow.LayoutOrder = 1
+			goldRow.Size = UDim2.new(1, 0, 1, 0)
+			applyRowIconScale(goldRow, 1.7)
+		else
+			currencyBar.AnchorPoint = Vector2.new(0, 1)
+			currencyBar.Position = UDim2.new(CURRENCY_POS_X, 0, CURRENCY_POS_Y, 0)
+			currencyBar.Size = UDim2.new(CURRENCY_WIDTH, 0, CURRENCY_HEIGHT, 0)
+			currencyLayout.FillDirection = Enum.FillDirection.Vertical
+			currencyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			currencyLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+			currencyLayout.Padding = UDim.new(0.02, 0)
+			blackRow.Visible = true
+			stoneRow.Visible = true
+			goldRow.Visible = true
+			blackRow.LayoutOrder = 1
+			stoneRow.LayoutOrder = 2
+			goldRow.LayoutOrder = 3
+			for _, row in { blackRow, stoneRow, goldRow } do
+				row.Size = UDim2.new(1, 0, 0.24, 0)
+				applyRowIconScale(row, CURRENCY_ICON_SCALE)
+			end
+		end
+	end
 
 	local shell = Instance.new("Frame")
 	shell.Name = "HudShell"
@@ -759,7 +806,7 @@ function Hud.Start(remotes: {
 		status.TextColor3 = if ok then Color3.fromRGB(180, 220, 160) else Color3.fromRGB(230, 150, 140)
 	end
 
-	board = RecruitmentBoard.Create(gui, remotes, showStatus)
+	board = RecruitmentBoard.Create(gui, remotes, showStatus, setCurrencyDocked)
 
 	local function render(snapshot: Types.PlayerSnapshot)
 		latestSnapshot = snapshot

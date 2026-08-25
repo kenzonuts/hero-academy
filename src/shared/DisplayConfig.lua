@@ -229,7 +229,12 @@ end
 
 function DisplayConfig.RecruitmentBoardImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentBoardImage, "99473344266235")
+	return thumbImage(display and display.RecruitmentBoardImage, "116290958290679")
+end
+
+function DisplayConfig.RecruitmentBoardTitleImage(): string
+	local display = GameConfig.Display
+	return thumbImage(display and display.RecruitmentBoardTitleImage, "119061321199856")
 end
 
 function DisplayConfig.RecruitmentBoardCloseImage(): string

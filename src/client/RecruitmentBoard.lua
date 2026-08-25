@@ -15,7 +15,7 @@ local RecruitmentBoard = {}
 
 -- Layout tunables (scale of the board image).
 local BOARD_WIDTH = 0.82
-local BOARD_HEIGHT = 0.78
+local BOARD_HEIGHT = 0.82
 local CONTENT_POS = UDim2.new(0.5, 0, 0.56, 0)
 local CONTENT_SIZE = UDim2.new(0.9, 0, 0.7, 0)
 local SLOT_COLUMNS = 5
@@ -23,7 +23,9 @@ local SLOT_COUNT = 10
 local SLOT_CELL = UDim2.new(0.176, 0, 0.47, 0)
 local SLOT_PAD = UDim2.fromOffset(9, 10)
 local CLOSE_SIZE = 40
-local CLOSE_POS = UDim2.new(1, -10, 0, 14)
+local CLOSE_POS = UDim2.new(1, 8, 0, 38)
+local TITLE_POS = UDim2.new(0.5, 0, 0.02, 0)
+local TITLE_SIZE = UDim2.new(0.48, 0, 0.12, 0)
 local FLIP_HALF = 0.12
 local GLOW_SIZE = 1.35
 local GLOW_SPIN_SECONDS = 10
@@ -118,7 +120,7 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	local row = Instance.new("Frame")
 	row.Name = name
 	row.LayoutOrder = order
-	row.Size = UDim2.new(1, 0, 0.28, 0)
+	row.Size = UDim2.new(1, 0, 0.24, 0)
 	row.BackgroundTransparency = 1
 	row.ZIndex = 11
 	row.Parent = parent
@@ -170,12 +172,14 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	layout.VerticalAlignment = Enum.VerticalAlignment.Center
 	layout.Padding = UDim.new(0, 4)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
 	layout.Parent = costRow
 
 	local coin = Instance.new("ImageLabel")
 	coin.Name = "Coin"
+	coin.LayoutOrder = 1
 	coin.BackgroundTransparency = 1
-	coin.Size = UDim2.fromScale(0.2, 0.72)
+	coin.Size = UDim2.fromScale(0.22, 0.78)
 	coin.Image = DisplayConfig.RecruitmentGoldImage()
 	coin.ScaleType = Enum.ScaleType.Fit
 	coin.ZIndex = 12
@@ -186,8 +190,9 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 
 	local amount = Instance.new("TextLabel")
 	amount.Name = "Amount"
+	amount.LayoutOrder = 2
 	amount.BackgroundTransparency = 1
-	amount.Size = UDim2.new(0.7, 0, 0.9, 0)
+	amount.Size = UDim2.new(0.62, 0, 0.9, 0)
 	amount.Font = Enum.Font.GothamBold
 	amount.Text = fmtCompact(cost)
 	amount.TextColor3 = Color3.new(1, 1, 1)
@@ -210,7 +215,8 @@ function RecruitmentBoard.Create(
 		Accept: RemoteFunction,
 		Reject: RemoteFunction,
 	},
-	onMessage: ((string, boolean) -> ())?
+	onMessage: ((string, boolean) -> ())?,
+	onOpen: ((boolean) -> ())?
 ): BoardHandle
 	local player = Players.LocalPlayer
 
@@ -236,8 +242,8 @@ function RecruitmentBoard.Create(
 
 	local host = Instance.new("Frame")
 	host.Name = "BoardHost"
-	host.AnchorPoint = Vector2.new(0.5, 0.5)
-	host.Position = UDim2.new(0.5, 0, 0.54, 0)
+	host.AnchorPoint = Vector2.new(0.5, 0)
+	host.Position = UDim2.new(0.5, 0, 0.08, 0)
 	host.Size = UDim2.new(BOARD_WIDTH, 0, BOARD_HEIGHT, 0)
 	host.BackgroundTransparency = 1
 	host.Active = true
@@ -248,13 +254,26 @@ function RecruitmentBoard.Create(
 	board.Name = "Board"
 	board.BackgroundTransparency = 1
 	board.BorderSizePixel = 0
-	board.Size = UDim2.fromScale(1, 1)
+	board.Position = UDim2.new(0, 0, 0.08, 0)
+	board.Size = UDim2.new(1, 0, 0.86, 0)
 	board.Image = DisplayConfig.RecruitmentBoardImage()
 	board.ImageTransparency = 0
-	board.ScaleType = Enum.ScaleType.Fit
+	board.ScaleType = Enum.ScaleType.Stretch
 	board.Active = true
 	board.ZIndex = 9
 	board.Parent = host
+
+	local title = Instance.new("ImageLabel")
+	title.Name = "Title"
+	title.AnchorPoint = Vector2.new(0.5, 0)
+	title.Position = TITLE_POS
+	title.Size = TITLE_SIZE
+	title.BackgroundTransparency = 1
+	title.BorderSizePixel = 0
+	title.Image = DisplayConfig.RecruitmentBoardTitleImage()
+	title.ScaleType = Enum.ScaleType.Fit
+	title.ZIndex = 10
+	title.Parent = host
 
 	local content = Instance.new("Frame")
 	content.Name = "Content"
@@ -371,8 +390,8 @@ function RecruitmentBoard.Create(
 	local bottom = Instance.new("Frame")
 	bottom.Name = "Actions"
 	bottom.BackgroundTransparency = 1
-	bottom.Position = UDim2.new(0, 0, 0.86, 0)
-	bottom.Size = UDim2.new(1, 0, 0.16, 0)
+	bottom.Position = UDim2.new(0, 0, 0.82, 0)
+	bottom.Size = UDim2.new(1, 0, 0.15, 0)
 	bottom.ZIndex = 11
 	bottom.Parent = left
 
@@ -412,16 +431,16 @@ function RecruitmentBoard.Create(
 	local rail = Instance.new("Frame")
 	rail.Name = "RecruitRail"
 	rail.BackgroundTransparency = 1
-	rail.Position = UDim2.new(0.76, 0, 0.06, 0)
-	rail.Size = UDim2.new(0.24, 0, 0.72, 0)
+	rail.Position = UDim2.new(0.76, 0, 0.0, 0)
+	rail.Size = UDim2.new(0.24, 0, 0.82, 0)
 	rail.ZIndex = 11
 	rail.Parent = content
 
 	local railLayout = Instance.new("UIListLayout")
 	railLayout.FillDirection = Enum.FillDirection.Vertical
 	railLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	railLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-	railLayout.Padding = UDim.new(0.06, 0)
+	railLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+	railLayout.Padding = UDim.new(0.12, 0)
 	railLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	railLayout.Parent = rail
 
@@ -766,6 +785,9 @@ function RecruitmentBoard.Create(
 				freezeMovement()
 			else
 				restoreMovement()
+			end
+			if onOpen then
+				onOpen(visible)
 			end
 		end,
 		IsOpen = function()
