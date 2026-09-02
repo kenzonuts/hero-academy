@@ -127,9 +127,9 @@ local function autoLabelDistance(): number
 	end
 	if nearest < math.huge and nearest > 20 then
 		-- Cap so labels hide before they shrink into unreadable specks.
-		return math.clamp(nearest * factor, 45, 80)
+		return math.clamp(nearest * factor, 14, 20)
 	end
-	return 70
+	return 16
 end
 
 local function labelMaxDistance(): number
@@ -145,12 +145,22 @@ local function labelMaxDistance(): number
 	return cachedLabelDistance
 end
 
+local function labelStudsOffset(): Vector3
+	local y = 1.4
+	local display = GameConfig.Display
+	local config = display and display.HeroModels
+	if config and typeof(config.LabelStudsOffsetY) == "number" then
+		y = config.LabelStudsOffsetY
+	end
+	return Vector3.new(0, y, 0)
+end
+
 local function styleBillboard(gui: BillboardGui)
 	gui.AlwaysOnTop = true
 	gui.MaxDistance = labelMaxDistance()
 	gui.LightInfluence = 0
 	gui.Size = UDim2.fromOffset(200, 72)
-	gui.StudsOffset = Vector3.new(0, 2.4, 0)
+	gui.StudsOffset = labelStudsOffset()
 	local card = gui:FindFirstChild("Card")
 	if card and card:IsA("GuiObject") then
 		card.BackgroundTransparency = 1
@@ -211,7 +221,7 @@ local function attachLabel(host: Instance, hero: Types.Hero)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Label"
 	billboard.Size = UDim2.fromOffset(200, 72)
-	billboard.StudsOffset = Vector3.new(0, 2.4, 0)
+	billboard.StudsOffset = labelStudsOffset()
 	billboard.AlwaysOnTop = true
 	billboard.MaxDistance = labelMaxDistance()
 	billboard.LightInfluence = 0

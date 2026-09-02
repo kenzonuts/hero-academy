@@ -179,7 +179,10 @@ local GameConfig = {
 		RecruitmentOpenAllOffImage = "rbxassetid://99197636965121",
 		RecruitmentRecruitOnImage = "rbxassetid://118490906708775",
 		RecruitmentRecruitOffImage = "rbxassetid://126413221049424",
-		RecruitmentGoldImage = "rbxassetid://84858883493617",
+		RecruitmentGoldImage = "rbxassetid://129136027133209",
+		NavHomeImage = "rbxassetid://97332745177623",
+		NavGuildImage = "rbxassetid://81693683674496",
+		NavStoreImage = "rbxassetid://93199682618910",
 		-- Common = B1, Uncommon = B2, Rare = B3. B4+ reuse Rare until those assets exist.
 		RecruitmentCards = {
 			B1 = {
@@ -226,9 +229,11 @@ local GameConfig = {
 			},
 			-- Longest bounding-box axis after clone (studs). Same for every role.
 			TargetSize = 5,
-			-- 0 = auto: half the distance to the nearest other academy, capped so text stays readable.
-			LabelMaxDistance = 0,
-			LabelRangeFactor = 0.5,
+			-- Studs above hero for PAD / power text. Lower = closer to the model.
+			LabelStudsOffsetY = 1.4,
+			-- Only show label when camera/player is this close (studs). Keep low so corner pads hide from spawn.
+			LabelMaxDistance = 16,
+			LabelRangeFactor = 0.25,
 		},
 		TierColors = {
 			B1 = { 150, 150, 155 },

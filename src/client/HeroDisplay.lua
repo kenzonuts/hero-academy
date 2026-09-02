@@ -73,8 +73,9 @@ local function attachLabel(host: Instance, hero: Types.Hero)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Label"
 	billboard.Size = UDim2.fromOffset(150, 58)
-	billboard.StudsOffset = Vector3.new(0, 2.6, 0)
+	billboard.StudsOffset = Vector3.new(0, 1.4, 0)
 	billboard.AlwaysOnTop = true
+	billboard.MaxDistance = 16
 	billboard.Parent = part
 
 	local bg = Instance.new("Frame")

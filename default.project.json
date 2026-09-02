@@ -5,6 +5,9 @@
     "ReplicatedStorage": {
       "Shared": {
         "$path": "src/shared"
+      },
+      "UiImageRefs": {
+        "$path": "src/ui-image-refs.model.json"
       }
     },
     "ServerScriptService": {

@@ -206,55 +206,54 @@ local function numericId(value: any, fallback: string): string
 	return fallback
 end
 
--- Thumbnail URL so ImageLabel can show an uploaded Image asset (rbxassetid often stays 0x0).
-local function thumbImage(value: any, fallbackId: string): string
+local function assetImage(value: any, fallbackId: string): string
 	local id = numericId(value, fallbackId)
-	return string.format("rbxthumb://type=Asset&id=%s&w=420&h=420", id)
+	return "rbxassetid://" .. id
 end
 
 function DisplayConfig.GoldImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.GoldImage, "129136027133209")
+	return assetImage(display and display.GoldImage, "129136027133209")
 end
 
 function DisplayConfig.MagicStoneImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.MagicStoneImage, "116631277815450")
+	return assetImage(display and display.MagicStoneImage, "116631277815450")
 end
 
 function DisplayConfig.BlackCrystalImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.BlackCrystalImage, "96330948981939")
+	return assetImage(display and display.BlackCrystalImage, "96330948981939")
 end
 
 function DisplayConfig.RecruitmentBoardImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentBoardImage, "116290958290679")
+	return assetImage(display and display.RecruitmentBoardImage, "116290958290679")
 end
 
 function DisplayConfig.RecruitmentBoardTitleImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentBoardTitleImage, "119061321199856")
+	return assetImage(display and display.RecruitmentBoardTitleImage, "119061321199856")
 end
 
 function DisplayConfig.RecruitmentBoardCloseImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentBoardCloseImage, "101015762977670")
+	return assetImage(display and display.RecruitmentBoardCloseImage, "101015762977670")
 end
 
 function DisplayConfig.RecruitmentSlotEmptyImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentSlotEmptyImage, "118354964205016")
+	return assetImage(display and display.RecruitmentSlotEmptyImage, "118354964205016")
 end
 
 function DisplayConfig.RecruitmentSlotClosedImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentSlotClosedImage, "71614679116854")
+	return assetImage(display and display.RecruitmentSlotClosedImage, "71614679116854")
 end
 
 function DisplayConfig.RecruitmentCardGlowImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentCardGlowImage, "76685873525509")
+	return assetImage(display and display.RecruitmentCardGlowImage, "76685873525509")
 end
 
 local CARD_TIER_KEY = {
@@ -283,52 +282,112 @@ function DisplayConfig.RecruitmentCardImage(tier: string, heroType: string): str
 	if id == "" then
 		return nil
 	end
-	return string.format("rbxthumb://type=Asset&id=%s&w=420&h=420", id)
+	return "rbxassetid://" .. id
 end
 
 function DisplayConfig.RecruitmentTakeAllImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentTakeAllImage, "81879706897992")
+	return assetImage(display and display.RecruitmentTakeAllImage, "81879706897992")
 end
 
 function DisplayConfig.RecruitmentTakeAllOffImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentTakeAllOffImage, "124096776237817")
+	return assetImage(display and display.RecruitmentTakeAllOffImage, "124096776237817")
 end
 
 function DisplayConfig.RecruitmentClearAllImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentClearAllImage, "82321373313572")
+	return assetImage(display and display.RecruitmentClearAllImage, "82321373313572")
 end
 
 function DisplayConfig.RecruitmentClearAllOffImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentClearAllOffImage, "113494313258023")
+	return assetImage(display and display.RecruitmentClearAllOffImage, "113494313258023")
 end
 
 function DisplayConfig.RecruitmentOpenAllImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentOpenAllImage, "131641419808933")
+	return assetImage(display and display.RecruitmentOpenAllImage, "131641419808933")
 end
 
 function DisplayConfig.RecruitmentOpenAllOffImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentOpenAllOffImage, "99197636965121")
+	return assetImage(display and display.RecruitmentOpenAllOffImage, "99197636965121")
 end
 
 function DisplayConfig.RecruitmentRecruitOnImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentRecruitOnImage, "118490906708775")
+	return assetImage(display and display.RecruitmentRecruitOnImage, "118490906708775")
 end
 
 function DisplayConfig.RecruitmentRecruitOffImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentRecruitOffImage, "126413221049424")
+	return assetImage(display and display.RecruitmentRecruitOffImage, "126413221049424")
 end
 
 function DisplayConfig.RecruitmentGoldImage(): string
 	local display = GameConfig.Display
-	return thumbImage(display and display.RecruitmentGoldImage, "84858883493617")
+	return assetImage(display and display.RecruitmentGoldImage, "129136027133209")
+end
+
+function DisplayConfig.NavHomeImage(): string
+	local display = GameConfig.Display
+	return assetImage(display and display.NavHomeImage, "97332745177623")
+end
+
+function DisplayConfig.NavGuildImage(): string
+	local display = GameConfig.Display
+	return assetImage(display and display.NavGuildImage, "81693683674496")
+end
+
+function DisplayConfig.NavStoreImage(): string
+	local display = GameConfig.Display
+	return assetImage(display and display.NavStoreImage, "93199682618910")
+end
+
+local CARD_HERO_TYPES = { "Hammer", "Archer", "Knight", "Mage", "Shield" }
+local CARD_TIERS = { "B1", "B2", "B3" }
+
+function DisplayConfig.AllImageUrls(): { string }
+	local urls = {
+		DisplayConfig.GoldImage(),
+		DisplayConfig.MagicStoneImage(),
+		DisplayConfig.BlackCrystalImage(),
+		DisplayConfig.RecruitmentBoardImage(),
+		DisplayConfig.RecruitmentBoardTitleImage(),
+		DisplayConfig.RecruitmentBoardCloseImage(),
+		DisplayConfig.RecruitmentSlotEmptyImage(),
+		DisplayConfig.RecruitmentSlotClosedImage(),
+		DisplayConfig.RecruitmentCardGlowImage(),
+		DisplayConfig.RecruitmentTakeAllImage(),
+		DisplayConfig.RecruitmentTakeAllOffImage(),
+		DisplayConfig.RecruitmentClearAllImage(),
+		DisplayConfig.RecruitmentClearAllOffImage(),
+		DisplayConfig.RecruitmentOpenAllImage(),
+		DisplayConfig.RecruitmentOpenAllOffImage(),
+		DisplayConfig.RecruitmentRecruitOnImage(),
+		DisplayConfig.RecruitmentRecruitOffImage(),
+		DisplayConfig.RecruitmentGoldImage(),
+		DisplayConfig.NavHomeImage(),
+		DisplayConfig.NavGuildImage(),
+		DisplayConfig.NavStoreImage(),
+	}
+	for _, tier in CARD_TIERS do
+		for _, heroType in CARD_HERO_TYPES do
+			local url = DisplayConfig.RecruitmentCardImage(tier, heroType)
+			if url then
+				table.insert(urls, url)
+			end
+		end
+	end
+	return urls
+end
+
+function DisplayConfig.PreloadImages()
+	local ContentProvider = game:GetService("ContentProvider")
+	pcall(function()
+		ContentProvider:PreloadAsync(DisplayConfig.AllImageUrls())
+	end)
 end
 
 function DisplayConfig.SummonName(): string

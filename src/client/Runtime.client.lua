@@ -11,8 +11,13 @@ if sharedFolder == nil then
 end
 
 local Shared = sharedFolder
+local DisplayConfig = require(Shared:WaitForChild("DisplayConfig"))
 local Remotes = require(Shared:WaitForChild("Remotes"))
 local Types = require(Shared:WaitForChild("Types"))
+
+task.spawn(function()
+	DisplayConfig.PreloadImages()
+end)
 
 local Hud = require(script.Parent:WaitForChild("Hud"))
 

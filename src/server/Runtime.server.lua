@@ -90,6 +90,14 @@ remotes.StartRaid.OnServerInvoke = function(player: Player, mapId: any, heroIds:
 	return withResult(player, Raid.Start(player, mapId, heroIds))
 end
 
+remotes.TeleportHome.OnServerInvoke = function(player: Player)
+	if Academy.GetFolder(player) == nil then
+		return { ok = false, error = "No academy assigned." }
+	end
+	Academy.MoveToSpawn(player)
+	return { ok = true, message = "Returned to base." }
+end
+
 local function onPlayerAdded(player: Player)
 	local academyName = Academy.Assign(player)
 	if academyName == nil then

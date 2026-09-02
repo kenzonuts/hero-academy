@@ -179,14 +179,12 @@ local function makeRecruitButton(parent: Instance, name: string, title: string, 
 	coin.Name = "Coin"
 	coin.LayoutOrder = 1
 	coin.BackgroundTransparency = 1
-	coin.Size = UDim2.fromScale(0.22, 0.78)
-	coin.Image = DisplayConfig.RecruitmentGoldImage()
+	coin.Size = UDim2.fromScale(0.85, 0.85)
+	coin.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	coin.Image = DisplayConfig.GoldImage()
 	coin.ScaleType = Enum.ScaleType.Fit
 	coin.ZIndex = 12
 	coin.Parent = costRow
-	local coinAspect = Instance.new("UIAspectRatioConstraint")
-	coinAspect.AspectRatio = 1
-	coinAspect.Parent = coin
 
 	local amount = Instance.new("TextLabel")
 	amount.Name = "Amount"

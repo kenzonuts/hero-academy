@@ -214,6 +214,7 @@ function Hud.Start(remotes: {
 	UpgradeRecruitment: RemoteFunction,
 	UpgradeConverter: RemoteFunction,
 	StartRaid: RemoteFunction,
+	TeleportHome: RemoteFunction,
 }, onSnapshot: ((Types.PlayerSnapshot) -> ())?)
 	local player = Players.LocalPlayer
 	local gui = Instance.new("ScreenGui")
@@ -271,6 +272,47 @@ function Hud.Start(remotes: {
 	local stoneRow = stoneAmount.Parent :: Frame
 	local goldRow = goldAmount.Parent :: Frame
 
+	local teleportBar = Instance.new("Frame")
+	teleportBar.Name = "TeleportBar"
+	teleportBar.AnchorPoint = Vector2.new(0.5, 0)
+	teleportBar.Position = UDim2.new(0.5, 0, 0.012, 0)
+	teleportBar.Size = UDim2.new(0.42, 0, 0.085, 0)
+	teleportBar.BackgroundTransparency = 1
+	teleportBar.ZIndex = 25
+	teleportBar.Parent = gui
+
+	local teleportLayout = Instance.new("UIListLayout")
+	teleportLayout.FillDirection = Enum.FillDirection.Horizontal
+	teleportLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	teleportLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	teleportLayout.Padding = UDim.new(0.02, 0)
+	teleportLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	teleportLayout.Parent = teleportBar
+
+	local function makeTeleportButton(
+		name: string,
+		image: string,
+		order: number,
+		widthScale: number
+	): ImageButton
+		local button = Instance.new("ImageButton")
+		button.Name = name
+		button.LayoutOrder = order
+		button.Size = UDim2.new(widthScale, 0, 1, 0)
+		button.BackgroundTransparency = 1
+		button.BorderSizePixel = 0
+		button.AutoButtonColor = true
+		button.Image = image
+		button.ScaleType = Enum.ScaleType.Fit
+		button.ZIndex = 26
+		button.Parent = teleportBar
+		return button
+	end
+
+	local storeButton = makeTeleportButton("Store", DisplayConfig.NavStoreImage(), 1, 0.28)
+	local homeButton = makeTeleportButton("Home", DisplayConfig.NavHomeImage(), 2, 0.36)
+	local guildButton = makeTeleportButton("Guild", DisplayConfig.NavGuildImage(), 3, 0.28)
+
 	local function applyRowIconScale(row: Frame, scale: number)
 		local icon = row:FindFirstChild("Icon")
 		if icon and icon:IsA("ImageLabel") then
@@ -279,6 +321,7 @@ function Hud.Start(remotes: {
 	end
 
 	local function setCurrencyDocked(onBoard: boolean)
+		teleportBar.Visible = not onBoard
 		if onBoard then
 			currencyBar.AnchorPoint = Vector2.new(0, 0)
 			currencyBar.Position = UDim2.new(0.02, 0, 0.012, 0)
@@ -805,6 +848,19 @@ function Hud.Start(remotes: {
 		status.Text = message
 		status.TextColor3 = if ok then Color3.fromRGB(180, 220, 160) else Color3.fromRGB(230, 150, 140)
 	end
+
+	homeButton.MouseButton1Click:Connect(function()
+		local result = remotes.TeleportHome:InvokeServer()
+		if typeof(result) == "table" then
+			showStatus(tostring(result.message or result.error or "Home"), result.ok == true)
+		end
+	end)
+	storeButton.MouseButton1Click:Connect(function()
+		showStatus("Store coming soon.", false)
+	end)
+	guildButton.MouseButton1Click:Connect(function()
+		showStatus("Guild coming soon.", false)
+	end)
 
 	board = RecruitmentBoard.Create(gui, remotes, showStatus, setCurrencyDocked)
 
