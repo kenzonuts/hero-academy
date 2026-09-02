@@ -368,17 +368,21 @@ local function circleDiameter(part: BasePart): number
 	return math.max(mid, largest * 0.5)
 end
 
-local function targetModelSize(): number
+local function targetModelSize(): number?
 	local display = GameConfig.Display
 	local config = display and display.HeroModels
 	local value = config and config.TargetSize
 	if typeof(value) == "number" and value > 0 then
 		return value
 	end
-	return 5
+	return nil
 end
 
 local function fitModelUniform(model: Model)
+	local target = targetModelSize()
+	if target == nil then
+		return
+	end
 	local ok, boxSize = pcall(function()
 		local _, size = model:GetBoundingBox()
 		return size
@@ -390,7 +394,7 @@ local function fitModelUniform(model: Model)
 	if longest < 0.05 then
 		return
 	end
-	local factor = targetModelSize() / longest
+	local factor = target / longest
 	if math.abs(factor - 1) < 0.02 then
 		return
 	end

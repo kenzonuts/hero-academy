@@ -227,8 +227,8 @@ local GameConfig = {
 				Hammer = "HAMMER",
 				Shield = "SHIELD",
 			},
-			-- Longest bounding-box axis after clone (studs). Same for every role.
-			TargetSize = 5,
+			-- Longest bounding-box axis after clone (studs). 0 = keep original asset size.
+			TargetSize = 0,
 			-- Studs above hero for PAD / power text. Lower = closer to the model.
 			LabelStudsOffsetY = 1.4,
 			-- Only show label when camera/player is this close (studs). Keep low so corner pads hide from spawn.
