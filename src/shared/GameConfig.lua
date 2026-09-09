@@ -79,6 +79,8 @@ local GameConfig = {
 			B7 = 25000,
 			B8 = 60000,
 			B9 = 150000,
+			B10 = 400000,
+			B11 = 1000000,
 		},
 		StatRanges = {
 			B1 = { Power = { 10, 30 }, Production = { 3, 8 } },
@@ -90,6 +92,8 @@ local GameConfig = {
 			B7 = { Power = { 400, 600 }, Production = { 180, 320 } },
 			B8 = { Power = { 600, 900 }, Production = { 280, 450 } },
 			B9 = { Power = { 900, 1300 }, Production = { 400, 650 } },
+			B10 = { Power = { 1300, 1800 }, Production = { 550, 900 } },
+			B11 = { Power = { 1800, 2500 }, Production = { 750, 1200 } },
 		},
 		-- Weights per recruitment level. Higher level = better rolls; top tier stays rare.
 		TierWeights = {
@@ -108,8 +112,8 @@ local GameConfig = {
 			[13] = { B1 = 2900, B2 = 2100, B3 = 2150, B4 = 1300, B5 = 850, B6 = 480, B7 = 180, B8 = 20 },
 			[14] = { B1 = 2600, B2 = 2000, B3 = 2150, B4 = 1400, B5 = 960, B6 = 580, B7 = 220, B8 = 30 },
 			[15] = { B1 = 2400, B2 = 1900, B3 = 2100, B4 = 1450, B5 = 1080, B6 = 700, B7 = 260, B8 = 40, B9 = 10 },
-			[16] = { B1 = 2200, B2 = 1800, B3 = 2050, B4 = 1500, B5 = 1160, B6 = 790, B7 = 320, B8 = 60, B9 = 20 },
-			[17] = { B1 = 2000, B2 = 1700, B3 = 2000, B4 = 1550, B5 = 1240, B6 = 860, B7 = 370, B8 = 90, B9 = 40 },
+			[16] = { B1 = 2200, B2 = 1800, B3 = 2050, B4 = 1500, B5 = 1160, B6 = 790, B7 = 310, B8 = 50, B9 = 15, B10 = 5 },
+			[17] = { B1 = 2000, B2 = 1700, B3 = 2000, B4 = 1550, B5 = 1240, B6 = 840, B7 = 340, B8 = 60, B9 = 20, B10 = 10, B11 = 5 },
 		},
 		EliteTicketMinimumTier = "B3",
 	},
@@ -187,6 +191,7 @@ local GameConfig = {
 		NavHomeImage = "rbxassetid://97332745177623",
 		NavGuildImage = "rbxassetid://81693683674496",
 		NavStoreImage = "rbxassetid://93199682618910",
+		BagImage = "rbxassetid://119434680374367",
 		-- Common = B1, Uncommon = B2, Rare = B3. B4+ reuse Rare until those assets exist.
 		RecruitmentCards = {
 			B1 = {
@@ -213,6 +218,8 @@ local GameConfig = {
 		},
 		SummonName = "summon",
 		SummonPartNames = { "summonplate", "summon" },
+		-- Where accepted ducks appear before walking to their pad.
+		HeroExitGate = "gate",
 		GuildTeleportFolder = "GUILD",
 		GuildTeleportPart = "GUILDTP",
 		GuildFaceTarget = "NPC_GuildMaster",
@@ -232,8 +239,10 @@ local GameConfig = {
 				B7 = "TITAN",
 				B8 = "CONQUEROR",
 				B9 = "APEX",
+				B10 = "IMMORTAL",
+				B11 = "ETERNAL",
 			},
-			-- Model: duck_{role}_{tierLower} e.g. duck_warrior_rookie … duck_tank_apex
+			-- Model: duck_{role}_{tierLower} e.g. duck_warrior_rookie … duck_tank_eternal
 			Roles = {
 				warrior = "warrior",
 				archer = "archer",
@@ -248,6 +257,13 @@ local GameConfig = {
 				Shield = "tank",
 			},
 			FallbackTier = "ROOKIE",
+			-- Studs per second when walking from gate to pad after Accept.
+			WalkSpeed = 16,
+			-- Optional fallbacks if the duck model has no Animation / Animate StringValues.
+			-- Pad pose prefers Dance, then Idle. Walk is used gate→pad.
+			DanceAnimationId = "",
+			IdleAnimationId = "",
+			WalkAnimationId = "",
 			-- Longest bounding-box axis after clone (studs). 0 = keep original asset size.
 			TargetSize = 0,
 			-- Studs above hero for PAD / power text. Lower = closer to the model.
@@ -266,6 +282,8 @@ local GameConfig = {
 			B7 = { 255, 240, 180 },
 			B8 = { 200, 60, 60 },
 			B9 = { 40, 220, 230 },
+			B10 = { 180, 200, 255 },
+			B11 = { 245, 245, 250 },
 		},
 	},
 

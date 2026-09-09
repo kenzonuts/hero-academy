@@ -323,8 +323,33 @@ function Hud.Start(remotes: {
 		end
 	end
 
+	local bagButton = Instance.new("ImageButton")
+	bagButton.Name = "BagButton"
+	bagButton.AnchorPoint = Vector2.new(1, 1)
+	bagButton.Position = UDim2.new(0.985, 0, 0.975, 0)
+	bagButton.Size = UDim2.new(0.11, 0, 0.11, 0)
+	bagButton.BackgroundTransparency = 1
+	bagButton.BorderSizePixel = 0
+	bagButton.AutoButtonColor = true
+	bagButton.Image = DisplayConfig.BagImage()
+	bagButton.ScaleType = Enum.ScaleType.Fit
+	bagButton.ZIndex = 30
+	bagButton.Parent = gui
+
+	local bagAspect = Instance.new("UIAspectRatioConstraint")
+	bagAspect.AspectRatio = 1
+	bagAspect.Parent = bagButton
+
+	local openTab: TabId? = nil
+	local paintTabs: () -> () = function() end
+
 	local function setCurrencyDocked(onBoard: boolean)
 		teleportBar.Visible = not onBoard
+		bagButton.Visible = not onBoard
+		if onBoard and openTab == "heroes" then
+			openTab = nil
+			paintTabs()
+		end
 		if onBoard then
 			currencyBar.AnchorPoint = Vector2.new(0, 0)
 			currencyBar.Position = UDim2.new(0.02, 0, 0.012, 0)
@@ -368,7 +393,8 @@ function Hud.Start(remotes: {
 	shell.AutomaticSize = Enum.AutomaticSize.Y
 	shell.BackgroundTransparency = 1
 	shell.ZIndex = 21
-	-- Temporary: hide Heroes / Upgrade / Raid text UI until asset UI replaces it.
+	-- Temporary: hide Upgrade / Raid text UI until asset UI replaces it.
+	-- Bag (collection + sell) opens from the bottom-right BagButton.
 	shell.Visible = false
 	shell.Parent = gui
 
@@ -415,8 +441,11 @@ function Hud.Start(remotes: {
 	status.TextYAlignment = Enum.TextYAlignment.Center
 	status.Text = "Click a tab to open. Recruit at the summon pad."
 
-	local collectionPanel = makePanel(shell, "CollectionPanel", UDim2.fromOffset(NAV_WIDTH, 400))
-	collectionPanel.LayoutOrder = 2
+	local collectionPanel = makePanel(gui, "CollectionPanel", UDim2.fromOffset(NAV_WIDTH, 400))
+	collectionPanel.AnchorPoint = Vector2.new(1, 1)
+	collectionPanel.Position = UDim2.new(0.985, 0, 0.86, 0)
+	collectionPanel.ZIndex = 28
+	collectionPanel.Visible = false
 
 	local collectionTitle = makeLabel(collectionPanel, "Title", UDim2.fromOffset(16, 12), UDim2.new(1, -32, 0, 48))
 	collectionTitle.Font = Enum.Font.GothamBold
@@ -451,8 +480,6 @@ function Hud.Start(remotes: {
 
 	local selectedHeroId: string? = nil
 	local latestHeroes: { Types.Hero } = {}
-	local openTab: TabId? = nil
-	local paintTabs: () -> () = function() end
 	local board: RecruitmentBoard.BoardHandle? = nil
 
 	local sellButton = makeButton(collectionPanel, "Sell", "Sell", UDim2.fromOffset(16, 352))
@@ -925,6 +952,7 @@ function Hud.Start(remotes: {
 	end)
 
 	board = RecruitmentBoard.Create(gui, remotes, showStatus, setCurrencyDocked)
+	setCurrencyDocked(false)
 
 	local function render(snapshot: Types.PlayerSnapshot)
 		latestSnapshot = snapshot
@@ -1046,6 +1074,9 @@ function Hud.Start(remotes: {
 	end
 
 	heroesTab.MouseButton1Click:Connect(function()
+		setOpenTab("heroes")
+	end)
+	bagButton.MouseButton1Click:Connect(function()
 		setOpenTab("heroes")
 	end)
 	facilitiesTab.MouseButton1Click:Connect(function()

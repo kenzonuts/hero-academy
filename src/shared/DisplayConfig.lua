@@ -266,6 +266,8 @@ local CARD_TIER_KEY = {
 	B7 = "B3",
 	B8 = "B3",
 	B9 = "B3",
+	B10 = "B3",
+	B11 = "B3",
 }
 
 local CARD_ROLE_KEY = {
@@ -361,6 +363,11 @@ function DisplayConfig.NavStoreImage(): string
 	return assetImage(display and display.NavStoreImage, "93199682618910")
 end
 
+function DisplayConfig.BagImage(): string
+	local display = GameConfig.Display
+	return assetImage(display and display.BagImage, "119434680374367")
+end
+
 local CARD_HERO_TYPES = { "warrior", "archer", "mage", "support", "tank" }
 local CARD_TIERS = { "B1", "B2", "B3" }
 
@@ -387,6 +394,7 @@ function DisplayConfig.AllImageUrls(): { string }
 		DisplayConfig.NavHomeImage(),
 		DisplayConfig.NavGuildImage(),
 		DisplayConfig.NavStoreImage(),
+		DisplayConfig.BagImage(),
 	}
 	for _, tier in CARD_TIERS do
 		for _, heroType in CARD_HERO_TYPES do
@@ -433,6 +441,43 @@ function DisplayConfig.IsSummonInstance(inst: Instance): boolean
 		end
 	end
 	return name == DisplayConfig.SummonName()
+end
+
+function DisplayConfig.HeroExitGateName(): string
+	local display = GameConfig.Display
+	local value = display and display.HeroExitGate
+	if typeof(value) == "string" and value ~= "" then
+		return value
+	end
+	return "gate"
+end
+
+local function asGatePart(inst: Instance?): BasePart?
+	if inst == nil then
+		return nil
+	end
+	if inst:IsA("BasePart") then
+		return inst
+	end
+	if inst:IsA("Model") then
+		return inst.PrimaryPart or inst:FindFirstChildWhichIsA("BasePart", true)
+	end
+	return nil
+end
+
+function DisplayConfig.FindHeroExitGate(academyName: string?): BasePart?
+	local gateName = DisplayConfig.HeroExitGateName()
+	local folder = DisplayConfig.AcademyFolder(academyName)
+	if folder then
+		local localGate = folder:FindFirstChild(gateName, true)
+		local part = asGatePart(localGate)
+		if part then
+			return part
+		end
+	end
+	local Workspace = game:GetService("Workspace")
+	local worldGate = Workspace:FindFirstChild(gateName, true)
+	return asGatePart(worldGate)
 end
 
 function DisplayConfig.FindSummonInstance(academyName: string?): Instance?

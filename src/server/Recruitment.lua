@@ -10,9 +10,10 @@ local UpgradeConfig = require(Shared:WaitForChild("UpgradeConfig"))
 
 local Collection = require(script.Parent:WaitForChild("Collection"))
 local Economy = require(script.Parent:WaitForChild("Economy"))
+local HeroWorld = require(script.Parent:WaitForChild("HeroWorld"))
 local PlayerData = require(script.Parent:WaitForChild("PlayerData"))
 
-local TIER_ORDER = { "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9" }
+local TIER_ORDER = { "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10", "B11" }
 
 local Recruitment = {}
 
@@ -343,6 +344,8 @@ function Recruitment.Accept(player: Player, candidateId: any): Types.ActionResul
 		table.insert(state.Heroes, hero)
 		if hero.Status == "BAGGED" then
 			bagged += 1
+		elseif hero.Status == "ACTIVE" then
+			HeroWorld.RequestWalk(player, hero.HeroID)
 		end
 	end
 

@@ -22,6 +22,7 @@
     { "name": "NavHome", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://97332745177623", "Visible": false } },
     { "name": "NavGuild", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://81693683674496", "Visible": false } },
     { "name": "NavStore", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://93199682618910", "Visible": false } },
+    { "name": "Bag", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://119434680374367", "Visible": false } },
     { "name": "CardB1Hammer", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://130809043630263", "Visible": false } },
     { "name": "CardB1Archer", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://140461997445844", "Visible": false } },
     { "name": "CardB1Knight", "className": "ImageLabel", "properties": { "BackgroundTransparency": 1, "Image": "rbxassetid://97592705223227", "Visible": false } },

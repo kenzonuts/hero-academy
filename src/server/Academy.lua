@@ -242,14 +242,22 @@ function Academy.MoveToStore(player: Player, character: Model?): boolean
 end
 
 function Academy.BindCharacter(player: Player)
+	local function placeCharacter(character: Model)
+		-- Wait for root so PivotTo sticks (esp. right after spawn).
+		if character:WaitForChild("HumanoidRootPart", 8) == nil then
+			return
+		end
+		Academy.MoveToSpawn(player, character)
+	end
+
 	player.CharacterAdded:Connect(function(character)
 		task.defer(function()
-			Academy.MoveToSpawn(player, character)
+			placeCharacter(character)
 		end)
 	end)
 	if player.Character then
 		task.defer(function()
-			Academy.MoveToSpawn(player, player.Character)
+			placeCharacter(player.Character :: Model)
 		end)
 	end
 end
