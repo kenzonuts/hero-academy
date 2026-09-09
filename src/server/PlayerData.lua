@@ -4,6 +4,7 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
+local DisplayConfig = require(Shared:WaitForChild("DisplayConfig"))
 local GameConfig = require(Shared:WaitForChild("GameConfig"))
 local Types = require(Shared:WaitForChild("Types"))
 local UpgradeConfig = require(Shared:WaitForChild("UpgradeConfig"))
@@ -103,7 +104,7 @@ local function decodeHero(raw: any): Types.Hero?
 	end
 	local hero: Types.Hero = {
 		HeroID = asString(raw.HeroID, HttpService:GenerateGUID(false)),
-		HeroType = asString(raw.HeroType, "Knight"),
+		HeroType = asString(raw.HeroType, "warrior"),
 		Tier = asString(raw.Tier, "B1"),
 		Power = clampInt(asNumber(raw.Power, 10), 1, 1_000_000),
 		Production = clampInt(asNumber(raw.Production, 1), 0, 1_000_000),
@@ -113,6 +114,7 @@ local function decodeHero(raw: any): Types.Hero?
 		DisplaySlot = displaySlot,
 		CreatedAt = clampInt(asNumber(raw.CreatedAt, os.time()), 0, 4e9),
 	}
+	hero.HeroType = DisplayConfig.HeroRoleName(hero.HeroType)
 	if hero.AcceptCost <= 0 then
 		hero.AcceptCost = GameConfig.CatalogAcceptCost(hero.Tier)
 	end
@@ -129,7 +131,7 @@ local function decodeCandidate(raw: any): Types.Candidate?
 	end
 	return {
 		CandidateID = asString(raw.CandidateID, HttpService:GenerateGUID(false)),
-		HeroType = asString(raw.HeroType, "Knight"),
+		HeroType = DisplayConfig.HeroRoleName(asString(raw.HeroType, "warrior")),
 		Tier = asString(raw.Tier, "B1"),
 		Power = clampInt(asNumber(raw.Power, 10), 1, 1_000_000),
 		Production = clampInt(asNumber(raw.Production, 1), 0, 1_000_000),

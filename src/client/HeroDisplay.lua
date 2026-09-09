@@ -16,16 +16,8 @@ local lastKey = ""
 local function getTierColor(tier: string): Color3
 	local colors = GameConfig.Display and GameConfig.Display.TierColors
 	local rgb = { 160, 160, 165 }
-	if colors then
-		rgb = if tier == "B1"
-			then colors.B1
-			elseif tier == "B2" then colors.B2
-			elseif tier == "B3" then colors.B3
-			elseif tier == "B4" then colors.B4
-			elseif tier == "B5" then colors.B5
-			elseif tier == "B6" then colors.B6
-			elseif tier == "B7" then colors.B7
-			else rgb
+	if colors and typeof(colors[tier]) == "table" then
+		rgb = colors[tier]
 	end
 
 	return Color3.fromRGB(rgb[1], rgb[2], rgb[3])

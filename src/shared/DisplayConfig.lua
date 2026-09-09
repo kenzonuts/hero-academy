@@ -264,6 +264,21 @@ local CARD_TIER_KEY = {
 	B5 = "B3",
 	B6 = "B3",
 	B7 = "B3",
+	B8 = "B3",
+	B9 = "B3",
+}
+
+local CARD_ROLE_KEY = {
+	warrior = "warrior",
+	archer = "archer",
+	mage = "mage",
+	support = "support",
+	tank = "tank",
+	Knight = "warrior",
+	Archer = "archer",
+	Mage = "mage",
+	Hammer = "support",
+	Shield = "tank",
 }
 
 function DisplayConfig.RecruitmentCardImage(tier: string, heroType: string): string?
@@ -277,7 +292,8 @@ function DisplayConfig.RecruitmentCardImage(tier: string, heroType: string): str
 	if typeof(byTier) ~= "table" then
 		return nil
 	end
-	local raw = byTier[heroType]
+	local roleKey = CARD_ROLE_KEY[heroType] or heroType
+	local raw = byTier[roleKey]
 	local id = numericId(raw, "")
 	if id == "" then
 		return nil
@@ -345,7 +361,7 @@ function DisplayConfig.NavStoreImage(): string
 	return assetImage(display and display.NavStoreImage, "93199682618910")
 end
 
-local CARD_HERO_TYPES = { "Hammer", "Archer", "Knight", "Mage", "Shield" }
+local CARD_HERO_TYPES = { "warrior", "archer", "mage", "support", "tank" }
 local CARD_TIERS = { "B1", "B2", "B3" }
 
 function DisplayConfig.AllImageUrls(): { string }
@@ -507,6 +523,20 @@ function DisplayConfig.FindSummonPart(academyName: string?): BasePart?
 	return asPad(inst)
 end
 
+function DisplayConfig.HeroRoleName(heroType: string): string
+	local display = GameConfig.Display
+	local config = display and display.HeroModels
+	local roles = config and config.Roles
+	if typeof(roles) == "table" and typeof(roles[heroType]) == "string" then
+		return roles[heroType]
+	end
+	local legacy = CARD_ROLE_KEY[heroType]
+	if typeof(legacy) == "string" then
+		return legacy
+	end
+	return string.lower(heroType)
+end
+
 function DisplayConfig.HeroModelTemplate(tier: string, heroType: string): Instance?
 	local Workspace = game:GetService("Workspace")
 	local display = GameConfig.Display
@@ -516,30 +546,41 @@ function DisplayConfig.HeroModelTemplate(tier: string, heroType: string): Instan
 	end
 	local folderName = config.Folder
 	if typeof(folderName) ~= "string" or folderName == "" then
-		folderName = "HEROES"
+		folderName = "DUCKHERO"
 	end
 	local root = Workspace:FindFirstChild(folderName)
 	if root == nil then
 		return nil
 	end
+
 	local tiers = config.Tiers
-	local tierFolderName = "COMMON"
+	local tierFolderName = "ROOKIE"
 	if typeof(tiers) == "table" and typeof(tiers[tier]) == "string" then
 		tierFolderName = tiers[tier]
-	elseif tier ~= "B1" then
-		return nil
 	end
-	local tierFolder = root:FindFirstChild(tierFolderName)
-	if tierFolder == nil then
-		return nil
+	local fallbackTier = "ROOKIE"
+	if typeof(config.FallbackTier) == "string" and config.FallbackTier ~= "" then
+		fallbackTier = config.FallbackTier
 	end
-	local names = config.Names
-	local suffix = heroType
-	if typeof(names) == "table" and typeof(names[heroType]) == "string" then
-		suffix = names[heroType]
+
+	local role = DisplayConfig.HeroRoleName(heroType)
+	local function findInTier(folderLabel: string): Instance?
+		local tierFolder = root:FindFirstChild(folderLabel)
+		if tierFolder == nil then
+			return nil
+		end
+		local modelName = string.format("duck_%s_%s", role, string.lower(folderLabel))
+		return tierFolder:FindFirstChild(modelName)
 	end
-	local modelName = tierFolderName .. " " .. suffix
-	return tierFolder:FindFirstChild(modelName)
+
+	local found = findInTier(tierFolderName)
+	if found then
+		return found
+	end
+	if tierFolderName ~= fallbackTier then
+		return findInTier(fallbackTier)
+	end
+	return nil
 end
 
 return DisplayConfig

@@ -12,7 +12,7 @@ local Collection = require(script.Parent:WaitForChild("Collection"))
 local Economy = require(script.Parent:WaitForChild("Economy"))
 local PlayerData = require(script.Parent:WaitForChild("PlayerData"))
 
-local TIER_ORDER = { "B1", "B2", "B3", "B4", "B5", "B6", "B7" }
+local TIER_ORDER = { "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9" }
 
 local Recruitment = {}
 
@@ -34,40 +34,24 @@ end
 
 local function getAcceptFee(tier: string): number?
 	local fees = GameConfig.Recruitment.AcceptFeeByTier
-	if tier == "B1" then
-		return fees.B1
-	elseif tier == "B2" then
-		return fees.B2
-	elseif tier == "B3" then
-		return fees.B3
-	elseif tier == "B4" then
-		return fees.B4
-	elseif tier == "B5" then
-		return fees.B5
-	elseif tier == "B6" then
-		return fees.B6
-	elseif tier == "B7" then
-		return fees.B7
+	if typeof(fees) ~= "table" then
+		return nil
+	end
+	local value = fees[tier]
+	if typeof(value) == "number" then
+		return value
 	end
 	return nil
 end
 
 local function getStatRange(tier: string): { Power: { number }, Production: { number } }?
 	local ranges = GameConfig.Recruitment.StatRanges
-	if tier == "B1" then
-		return ranges.B1
-	elseif tier == "B2" then
-		return ranges.B2
-	elseif tier == "B3" then
-		return ranges.B3
-	elseif tier == "B4" then
-		return ranges.B4
-	elseif tier == "B5" then
-		return ranges.B5
-	elseif tier == "B6" then
-		return ranges.B6
-	elseif tier == "B7" then
-		return ranges.B7
+	if typeof(ranges) ~= "table" then
+		return nil
+	end
+	local value = ranges[tier]
+	if typeof(value) == "table" then
+		return value
 	end
 	return nil
 end

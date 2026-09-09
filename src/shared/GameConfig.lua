@@ -66,7 +66,7 @@ local GameConfig = {
 			[16] = 800_000_000_000_000,
 			[17] = 1_000_000_000_000_000,
 		},
-		HeroTypes = { "Knight", "Archer", "Mage", "Hammer", "Shield" },
+		HeroTypes = { "warrior", "archer", "mage", "support", "tank" },
 		ChargeAcceptFee = false,
 		-- Catalog value by tier. Used for Sell refund, not charged on Accept.
 		AcceptFeeByTier = {
@@ -77,6 +77,8 @@ local GameConfig = {
 			B5 = 4000,
 			B6 = 10000,
 			B7 = 25000,
+			B8 = 60000,
+			B9 = 150000,
 		},
 		StatRanges = {
 			B1 = { Power = { 10, 30 }, Production = { 3, 8 } },
@@ -86,8 +88,10 @@ local GameConfig = {
 			B5 = { Power = { 150, 250 }, Production = { 60, 150 } },
 			B6 = { Power = { 250, 400 }, Production = { 120, 220 } },
 			B7 = { Power = { 400, 600 }, Production = { 180, 320 } },
+			B8 = { Power = { 600, 900 }, Production = { 280, 450 } },
+			B9 = { Power = { 900, 1300 }, Production = { 400, 650 } },
 		},
-		-- Weights per recruitment level. Higher level = better rolls; B7 stays rare.
+		-- Weights per recruitment level. Higher level = better rolls; top tier stays rare.
 		TierWeights = {
 			[1] = { B1 = 9300, B2 = 700 },
 			[2] = { B1 = 8500, B2 = 1400, B3 = 100 },
@@ -100,12 +104,12 @@ local GameConfig = {
 			[9] = { B1 = 4500, B2 = 2500, B3 = 1800, B4 = 750, B5 = 320, B6 = 110, B7 = 20 },
 			[10] = { B1 = 4000, B2 = 2400, B3 = 2000, B4 = 900, B5 = 450, B6 = 200, B7 = 50 },
 			[11] = { B1 = 3600, B2 = 2300, B3 = 2100, B4 = 1050, B5 = 580, B6 = 280, B7 = 90 },
-			[12] = { B1 = 3200, B2 = 2200, B3 = 2150, B4 = 1200, B5 = 720, B6 = 380, B7 = 150 },
-			[13] = { B1 = 2900, B2 = 2100, B3 = 2150, B4 = 1300, B5 = 850, B6 = 500, B7 = 200 },
-			[14] = { B1 = 2600, B2 = 2000, B3 = 2150, B4 = 1400, B5 = 980, B6 = 620, B7 = 250 },
-			[15] = { B1 = 2400, B2 = 1900, B3 = 2100, B4 = 1450, B5 = 1100, B6 = 750, B7 = 300 },
-			[16] = { B1 = 2200, B2 = 1800, B3 = 2050, B4 = 1500, B5 = 1200, B6 = 850, B7 = 400 },
-			[17] = { B1 = 2000, B2 = 1700, B3 = 2000, B4 = 1550, B5 = 1300, B6 = 950, B7 = 500 },
+			[12] = { B1 = 3200, B2 = 2200, B3 = 2150, B4 = 1200, B5 = 720, B6 = 380, B7 = 140, B8 = 10 },
+			[13] = { B1 = 2900, B2 = 2100, B3 = 2150, B4 = 1300, B5 = 850, B6 = 480, B7 = 180, B8 = 20 },
+			[14] = { B1 = 2600, B2 = 2000, B3 = 2150, B4 = 1400, B5 = 960, B6 = 580, B7 = 220, B8 = 30 },
+			[15] = { B1 = 2400, B2 = 1900, B3 = 2100, B4 = 1450, B5 = 1080, B6 = 700, B7 = 260, B8 = 40, B9 = 10 },
+			[16] = { B1 = 2200, B2 = 1800, B3 = 2050, B4 = 1500, B5 = 1160, B6 = 790, B7 = 320, B8 = 60, B9 = 20 },
+			[17] = { B1 = 2000, B2 = 1700, B3 = 2000, B4 = 1550, B5 = 1240, B6 = 860, B7 = 370, B8 = 90, B9 = 40 },
 		},
 		EliteTicketMinimumTier = "B3",
 	},
@@ -186,25 +190,25 @@ local GameConfig = {
 		-- Common = B1, Uncommon = B2, Rare = B3. B4+ reuse Rare until those assets exist.
 		RecruitmentCards = {
 			B1 = {
-				Hammer = "130809043630263",
-				Archer = "140461997445844",
-				Knight = "97592705223227",
-				Mage = "126954993553801",
-				Shield = "104561466655136",
+				warrior = "130809043630263",
+				archer = "140461997445844",
+				tank = "97592705223227",
+				mage = "126954993553801",
+				support = "104561466655136",
 			},
 			B2 = {
-				Hammer = "73036020177015",
-				Archer = "128187837811649",
-				Knight = "93720067000870",
-				Mage = "97507957306573",
-				Shield = "119805615910871",
+				warrior = "73036020177015",
+				archer = "128187837811649",
+				tank = "93720067000870",
+				mage = "97507957306573",
+				support = "119805615910871",
 			},
 			B3 = {
-				Hammer = "84223562637640",
-				Archer = "76208226702913",
-				Knight = "90563795731746",
-				Mage = "131280301491407",
-				Shield = "109461157152898",
+				warrior = "84223562637640",
+				archer = "76208226702913",
+				tank = "90563795731746",
+				mage = "131280301491407",
+				support = "109461157152898",
 			},
 		},
 		SummonName = "summon",
@@ -216,23 +220,34 @@ local GameConfig = {
 		StoreTeleportPart = "STORETP",
 		StoreFaceTarget = "NPC_Shopkeeper",
 		HeroModels = {
-			Folder = "HEROES",
+			Folder = "DUCKHERO",
+			-- Only map tiers that already have duck folders. More ranks later.
 			Tiers = {
-				B1 = "COMMON",
-				B2 = "UNCOMMON",
-				B3 = "RARE",
-				B4 = "RARE",
-				B5 = "RARE",
-				B6 = "RARE",
-				B7 = "RARE",
+				B1 = "ROOKIE",
+				B2 = "VETERAN",
+				B3 = "ELITE",
+				B4 = "CHAMPION",
+				B5 = "LEGEND",
+				B6 = "MYTHIC",
+				B7 = "TITAN",
+				B8 = "CONQUEROR",
+				B9 = "APEX",
 			},
-			Names = {
-				Knight = "KNIGHT",
-				Archer = "BOW",
-				Mage = "STAFF",
-				Hammer = "HAMMER",
-				Shield = "SHIELD",
+			-- Model: duck_{role}_{tierLower} e.g. duck_warrior_rookie … duck_tank_apex
+			Roles = {
+				warrior = "warrior",
+				archer = "archer",
+				mage = "mage",
+				support = "support",
+				tank = "tank",
+				-- Legacy saves
+				Knight = "warrior",
+				Archer = "archer",
+				Mage = "mage",
+				Hammer = "support",
+				Shield = "tank",
 			},
+			FallbackTier = "ROOKIE",
 			-- Longest bounding-box axis after clone (studs). 0 = keep original asset size.
 			TargetSize = 0,
 			-- Studs above hero for PAD / power text. Lower = closer to the model.
@@ -249,14 +264,16 @@ local GameConfig = {
 			B5 = { 230, 180, 60 },
 			B6 = { 230, 90, 70 },
 			B7 = { 255, 240, 180 },
+			B8 = { 200, 60, 60 },
+			B9 = { 40, 220, 230 },
 		},
 	},
 
 	Phase1 = {
 		StartingGold = 1000,
 		SeedHeroes = {
-			{ HeroType = "Knight", Tier = "B1", Power = 20, Production = 10 },
-			{ HeroType = "Mage", Tier = "B2", Power = 48, Production = 25 },
+			{ HeroType = "warrior", Tier = "B1", Power = 20, Production = 10 },
+			{ HeroType = "mage", Tier = "B2", Power = 48, Production = 25 },
 		},
 	},
 
