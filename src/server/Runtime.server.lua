@@ -98,6 +98,20 @@ remotes.TeleportHome.OnServerInvoke = function(player: Player)
 	return { ok = true, message = "Returned to base." }
 end
 
+remotes.TeleportGuild.OnServerInvoke = function(player: Player)
+	if not Academy.MoveToGuild(player) then
+		return { ok = false, error = "Guild teleport missing (GUILDTP)." }
+	end
+	return { ok = true, message = "Teleported to Guild." }
+end
+
+remotes.TeleportStore.OnServerInvoke = function(player: Player)
+	if not Academy.MoveToStore(player) then
+		return { ok = false, error = "Store teleport missing (STORETP)." }
+	end
+	return { ok = true, message = "Teleported to Store." }
+end
+
 local function onPlayerAdded(player: Player)
 	local academyName = Academy.Assign(player)
 	if academyName == nil then

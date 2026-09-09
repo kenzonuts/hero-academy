@@ -2,6 +2,7 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local DisplayConfig = require(Shared:WaitForChild("DisplayConfig"))
@@ -215,6 +216,8 @@ function Hud.Start(remotes: {
 	UpgradeConverter: RemoteFunction,
 	StartRaid: RemoteFunction,
 	TeleportHome: RemoteFunction,
+	TeleportGuild: RemoteFunction,
+	TeleportStore: RemoteFunction,
 }, onSnapshot: ((Types.PlayerSnapshot) -> ())?)
 	local player = Players.LocalPlayer
 	local gui = Instance.new("ScreenGui")
@@ -365,7 +368,23 @@ function Hud.Start(remotes: {
 	shell.AutomaticSize = Enum.AutomaticSize.Y
 	shell.BackgroundTransparency = 1
 	shell.ZIndex = 21
+	-- Temporary: hide Heroes / Upgrade / Raid text UI until asset UI replaces it.
+	shell.Visible = false
 	shell.Parent = gui
+
+	local statusToast = Instance.new("TextLabel")
+	statusToast.Name = "StatusToast"
+	statusToast.AnchorPoint = Vector2.new(0.5, 0)
+	statusToast.Position = UDim2.new(0.5, 0, 0.11, 0)
+	statusToast.Size = UDim2.new(0.5, 0, 0, 28)
+	statusToast.BackgroundTransparency = 1
+	statusToast.Font = Enum.Font.Gotham
+	statusToast.TextSize = 14
+	statusToast.TextColor3 = Color3.fromRGB(180, 220, 160)
+	statusToast.Text = ""
+	statusToast.TextXAlignment = Enum.TextXAlignment.Center
+	statusToast.ZIndex = 28
+	statusToast.Parent = gui
 
 	local stack = Instance.new("UIListLayout")
 	stack.SortOrder = Enum.SortOrder.LayoutOrder
@@ -847,19 +866,62 @@ function Hud.Start(remotes: {
 	local function showStatus(message: string, ok: boolean)
 		status.Text = message
 		status.TextColor3 = if ok then Color3.fromRGB(180, 220, 160) else Color3.fromRGB(230, 150, 140)
+		statusToast.Text = message
+		statusToast.TextColor3 = status.TextColor3
+	end
+
+	local function snapCameraToCharacter()
+		local character = player.Character
+		if character == nil then
+			return
+		end
+		local root = character:FindFirstChild("HumanoidRootPart")
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		local camera = Workspace.CurrentCamera
+		if root == nil or not root:IsA("BasePart") or camera == nil then
+			return
+		end
+		local look = root.CFrame.LookVector
+		local flatLook = Vector3.new(look.X, 0, look.Z)
+		if flatLook.Magnitude < 0.05 then
+			flatLook = Vector3.new(0, 0, -1)
+		else
+			flatLook = flatLook.Unit
+		end
+		local focus = root.Position + Vector3.new(0, 1.5, 0)
+		local camPos = focus - flatLook * 10 + Vector3.new(0, 3, 0)
+		camera.CameraType = Enum.CameraType.Scriptable
+		camera.CFrame = CFrame.lookAt(camPos, focus + flatLook * 4)
+		task.defer(function()
+			camera.CameraType = Enum.CameraType.Custom
+			if humanoid then
+				camera.CameraSubject = humanoid
+			end
+		end)
+	end
+
+	local function afterTeleport(result: any, fallback: string)
+		if typeof(result) ~= "table" then
+			return
+		end
+		local ok = result.ok == true
+		showStatus(tostring(result.message or result.error or fallback), ok)
+		if ok then
+			task.spawn(function()
+				task.wait(0.05)
+				snapCameraToCharacter()
+			end)
+		end
 	end
 
 	homeButton.MouseButton1Click:Connect(function()
-		local result = remotes.TeleportHome:InvokeServer()
-		if typeof(result) == "table" then
-			showStatus(tostring(result.message or result.error or "Home"), result.ok == true)
-		end
+		afterTeleport(remotes.TeleportHome:InvokeServer(), "Home")
 	end)
 	storeButton.MouseButton1Click:Connect(function()
-		showStatus("Store coming soon.", false)
+		afterTeleport(remotes.TeleportStore:InvokeServer(), "Store")
 	end)
 	guildButton.MouseButton1Click:Connect(function()
-		showStatus("Guild coming soon.", false)
+		afterTeleport(remotes.TeleportGuild:InvokeServer(), "Guild")
 	end)
 
 	board = RecruitmentBoard.Create(gui, remotes, showStatus, setCurrencyDocked)

@@ -15,6 +15,8 @@ local REMOTE_FUNCTIONS = {
 	"UpgradeConverter",
 	"StartRaid",
 	"TeleportHome",
+	"TeleportGuild",
+	"TeleportStore",
 }
 
 local function ensureInstance(folder: Folder, name: string, className: string): Instance
@@ -64,6 +66,8 @@ export type ServerRemotes = {
 	UpgradeConverter: RemoteFunction,
 	StartRaid: RemoteFunction,
 	TeleportHome: RemoteFunction,
+	TeleportGuild: RemoteFunction,
+	TeleportStore: RemoteFunction,
 }
 
 function Remotes.Get(): ServerRemotes
@@ -79,6 +83,8 @@ function Remotes.Get(): ServerRemotes
 		UpgradeConverter = folder:WaitForChild("UpgradeConverter") :: RemoteFunction,
 		StartRaid = folder:WaitForChild("StartRaid") :: RemoteFunction,
 		TeleportHome = folder:WaitForChild("TeleportHome") :: RemoteFunction,
+		TeleportGuild = folder:WaitForChild("TeleportGuild") :: RemoteFunction,
+		TeleportStore = folder:WaitForChild("TeleportStore") :: RemoteFunction,
 	}
 end
 

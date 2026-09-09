@@ -106,14 +106,62 @@ local function findSpawnPart(academy: Instance): BasePart?
 	return pads[1]
 end
 
+local function asLookPosition(target: Instance): Vector3?
+	if target:IsA("BasePart") then
+		return target.Position
+	end
+	if target:IsA("Model") then
+		local part = target.PrimaryPart or target:FindFirstChildWhichIsA("BasePart", true)
+		if part then
+			return part.Position
+		end
+		return target:GetPivot().Position
+	end
+	return nil
+end
+
+local function flatLookAt(fromPos: Vector3, lookPos: Vector3): CFrame
+	local flat = Vector3.new(lookPos.X - fromPos.X, 0, lookPos.Z - fromPos.Z)
+	if flat.Magnitude < 0.05 then
+		return CFrame.new(fromPos)
+	end
+	return CFrame.lookAt(fromPos, fromPos + flat)
+end
+
+function Academy.FindNamedInstance(name: string): Instance?
+	if typeof(name) ~= "string" or name == "" then
+		return nil
+	end
+	return Workspace:FindFirstChild(name, true)
+end
+
+function Academy.MoveToPart(player: Player, part: BasePart, character: Model?, faceTarget: Instance?): boolean
+	local model = character or player.Character
+	if model == nil then
+		return false
+	end
+
+	local root = model:FindFirstChild("HumanoidRootPart")
+	if root == nil or not root:IsA("BasePart") then
+		root = model:WaitForChild("HumanoidRootPart", 8)
+	end
+	if root == nil or not root:IsA("BasePart") then
+		return false
+	end
+
+	local destPos = part.Position + Vector3.new(0, part.Size.Y * 0.5 + 4, 0)
+	local lookPos = if faceTarget then asLookPosition(faceTarget) else nil
+	if lookPos then
+		model:PivotTo(flatLookAt(destPos, lookPos))
+	else
+		model:PivotTo(part.CFrame + Vector3.new(0, part.Size.Y * 0.5 + 4, 0))
+	end
+	return true
+end
+
 function Academy.MoveToSpawn(player: Player, character: Model?)
 	local academy = Academy.GetFolder(player)
 	if academy == nil then
-		return
-	end
-
-	local model = character or player.Character
-	if model == nil then
 		return
 	end
 
@@ -122,16 +170,75 @@ function Academy.MoveToSpawn(player: Player, character: Model?)
 		return
 	end
 
-	local root = model:FindFirstChild("HumanoidRootPart")
-	if root == nil or not root:IsA("BasePart") then
-		root = model:WaitForChild("HumanoidRootPart", 8)
-	end
-	if root == nil or not root:IsA("BasePart") then
-		return
-	end
+	Academy.MoveToPart(player, spawnPart, character, nil)
+end
 
-	local dest = spawnPart.CFrame + Vector3.new(0, spawnPart.Size.Y * 0.5 + 4, 0)
-	model:PivotTo(dest)
+function Academy.FindTeleportPart(folderName: string?, partName: string): BasePart?
+	if typeof(partName) ~= "string" or partName == "" then
+		return nil
+	end
+	if typeof(folderName) == "string" and folderName ~= "" then
+		local folder = Workspace:FindFirstChild(folderName)
+		if folder then
+			local child = folder:FindFirstChild(partName)
+			if child and child:IsA("BasePart") then
+				return child
+			end
+			local nested = folder:FindFirstChild(partName, true)
+			if nested and nested:IsA("BasePart") then
+				return nested
+			end
+		end
+	end
+	local found = Workspace:FindFirstChild(partName, true)
+	if found and found:IsA("BasePart") then
+		return found
+	end
+	return nil
+end
+
+function Academy.MoveToGuild(player: Player, character: Model?): boolean
+	local display = GameConfig.Display
+	local folderName = if display and typeof(display.GuildTeleportFolder) == "string"
+		then display.GuildTeleportFolder
+		else "GUILD"
+	local partName = if display and typeof(display.GuildTeleportPart) == "string"
+		then display.GuildTeleportPart
+		else "GUILDTP"
+	local part = Academy.FindTeleportPart(folderName, partName)
+	if part == nil then
+		part = Academy.FindTeleportPart(nil, partName)
+	end
+	if part == nil then
+		return false
+	end
+	local faceName = if display and typeof(display.GuildFaceTarget) == "string"
+		then display.GuildFaceTarget
+		else "NPC_GuildMaster"
+	local face = Academy.FindNamedInstance(faceName)
+	return Academy.MoveToPart(player, part, character, face)
+end
+
+function Academy.MoveToStore(player: Player, character: Model?): boolean
+	local display = GameConfig.Display
+	local folderName = if display and typeof(display.StoreTeleportFolder) == "string"
+		then display.StoreTeleportFolder
+		else "STORE"
+	local partName = if display and typeof(display.StoreTeleportPart) == "string"
+		then display.StoreTeleportPart
+		else "STORETP"
+	local part = Academy.FindTeleportPart(folderName, partName)
+	if part == nil then
+		part = Academy.FindTeleportPart(nil, partName)
+	end
+	if part == nil then
+		return false
+	end
+	local faceName = if display and typeof(display.StoreFaceTarget) == "string"
+		then display.StoreFaceTarget
+		else "NPC_Shopkeeper"
+	local face = Academy.FindNamedInstance(faceName)
+	return Academy.MoveToPart(player, part, character, face)
 end
 
 function Academy.BindCharacter(player: Player)

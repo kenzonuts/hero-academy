@@ -209,6 +209,12 @@ local GameConfig = {
 		},
 		SummonName = "summon",
 		SummonPartNames = { "summonplate", "summon" },
+		GuildTeleportFolder = "GUILD",
+		GuildTeleportPart = "GUILDTP",
+		GuildFaceTarget = "NPC_GuildMaster",
+		StoreTeleportFolder = "STORE",
+		StoreTeleportPart = "STORETP",
+		StoreFaceTarget = "NPC_Shopkeeper",
 		HeroModels = {
 			Folder = "HEROES",
 			Tiers = {
