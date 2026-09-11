@@ -220,6 +220,16 @@ local GameConfig = {
 		SummonPartNames = { "summonplate", "summon" },
 		-- Where accepted ducks appear before walking to their pad.
 		HeroExitGate = "gate",
+		-- Visual gate upgrades (Workspace catalog). Level tracks RecruitmentLevel, capped at MaxLevel.
+		Gates = {
+			Folder = "GATES LEVEL",
+			Prefix = "GATE",
+			MaxLevel = 10,
+			-- Cloned into each academy as this name.
+			ActiveName = "ActiveGate",
+			-- Optional invisible Part in AKADEMI* used as placement pivot.
+			AnchorName = "GateAnchor",
+		},
 		GuildTeleportFolder = "GUILD",
 		GuildTeleportPart = "GUILDTP",
 		GuildFaceTarget = "NPC_GuildMaster",
@@ -264,6 +274,8 @@ local GameConfig = {
 			DanceAnimationId = "",
 			IdleAnimationId = "",
 			WalkAnimationId = "",
+			-- Studs above pad top so animated feet / dance don't clip into the pad.
+			PadStandLift = 0.28,
 			-- Longest bounding-box axis after clone (studs). 0 = keep original asset size.
 			TargetSize = 0,
 			-- Studs above hero for PAD / power text. Lower = closer to the model.

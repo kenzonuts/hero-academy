@@ -452,6 +452,105 @@ function DisplayConfig.HeroExitGateName(): string
 	return "gate"
 end
 
+local function gatesConfig(): { [string]: any }?
+	local display = GameConfig.Display
+	local config = display and display.Gates
+	if typeof(config) == "table" then
+		return config
+	end
+	return nil
+end
+
+function DisplayConfig.GatesFolderName(): string
+	local config = gatesConfig()
+	local name = config and config.Folder
+	if typeof(name) == "string" and name ~= "" then
+		return name
+	end
+	return "GATES LEVEL"
+end
+
+function DisplayConfig.GatePrefix(): string
+	local config = gatesConfig()
+	local prefix = config and config.Prefix
+	if typeof(prefix) == "string" and prefix ~= "" then
+		return prefix
+	end
+	return "GATE"
+end
+
+function DisplayConfig.MaxGateLevel(): number
+	local config = gatesConfig()
+	local value = config and config.MaxLevel
+	if typeof(value) == "number" and value >= 1 then
+		return math.floor(value)
+	end
+	return 10
+end
+
+function DisplayConfig.ActiveGateName(): string
+	local config = gatesConfig()
+	local name = config and config.ActiveName
+	if typeof(name) == "string" and name ~= "" then
+		return name
+	end
+	return "ActiveGate"
+end
+
+function DisplayConfig.GateAnchorName(): string
+	local config = gatesConfig()
+	local name = config and config.AnchorName
+	if typeof(name) == "string" and name ~= "" then
+		return name
+	end
+	return "GateAnchor"
+end
+
+-- RecruitmentLevel 1..∞ → GATE1..GATE10 (capped).
+function DisplayConfig.GateLevelFromRecruitment(recruitmentLevel: number): number
+	local level = math.floor(recruitmentLevel)
+	if level < 1 then
+		level = 1
+	end
+	return math.clamp(level, 1, DisplayConfig.MaxGateLevel())
+end
+
+function DisplayConfig.IsInsideGatesCatalog(inst: Instance?): boolean
+	if inst == nil then
+		return false
+	end
+	local catalogName = DisplayConfig.GatesFolderName()
+	local current: Instance? = inst
+	while current do
+		if current.Name == catalogName then
+			return true
+		end
+		current = current.Parent
+	end
+	return false
+end
+
+function DisplayConfig.FindGateTemplate(gateLevel: number): Instance?
+	local Workspace = game:GetService("Workspace")
+	local root = Workspace:FindFirstChild(DisplayConfig.GatesFolderName())
+	if root == nil then
+		return nil
+	end
+	local level = DisplayConfig.GateLevelFromRecruitment(gateLevel)
+	local name = DisplayConfig.GatePrefix() .. tostring(level)
+	local template = root:FindFirstChild(name)
+	if template == nil then
+		-- Soft fallback: highest available GATE below requested.
+		for tryLevel = level - 1, 1, -1 do
+			template = root:FindFirstChild(DisplayConfig.GatePrefix() .. tostring(tryLevel))
+			if template then
+				break
+			end
+		end
+	end
+	return template
+end
+
 local function asGatePart(inst: Instance?): BasePart?
 	if inst == nil then
 		return nil
@@ -469,15 +568,28 @@ function DisplayConfig.FindHeroExitGate(academyName: string?): BasePart?
 	local gateName = DisplayConfig.HeroExitGateName()
 	local folder = DisplayConfig.AcademyFolder(academyName)
 	if folder then
+		local active = folder:FindFirstChild(DisplayConfig.ActiveGateName())
+		if active then
+			local nested = active:FindFirstChild(gateName, true)
+			local fromActive = asGatePart(nested) or asGatePart(active)
+			if fromActive then
+				return fromActive
+			end
+		end
 		local localGate = folder:FindFirstChild(gateName, true)
-		local part = asGatePart(localGate)
-		if part then
-			return part
+		if localGate and not DisplayConfig.IsInsideGatesCatalog(localGate) then
+			local part = asGatePart(localGate)
+			if part then
+				return part
+			end
 		end
 	end
 	local Workspace = game:GetService("Workspace")
 	local worldGate = Workspace:FindFirstChild(gateName, true)
-	return asGatePart(worldGate)
+	if worldGate and not DisplayConfig.IsInsideGatesCatalog(worldGate) then
+		return asGatePart(worldGate)
+	end
+	return nil
 end
 
 function DisplayConfig.FindSummonInstance(academyName: string?): Instance?

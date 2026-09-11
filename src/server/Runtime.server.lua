@@ -32,6 +32,7 @@ local Sell = require(modules:WaitForChild("Sell"))
 local Snapshot = require(modules:WaitForChild("Snapshot"))
 local Upgrades = require(modules:WaitForChild("Upgrades"))
 local HeroWorld = require(modules:WaitForChild("HeroWorld"))
+local GateDisplay = require(modules:WaitForChild("GateDisplay"))
 
 local TICK_SECONDS = 1
 local AUTOSAVE_SECONDS = 60
@@ -44,6 +45,7 @@ print(string.format(
 ))
 
 local function pushState(player: Player)
+	GateDisplay.Sync(player)
 	HeroWorld.Sync(player)
 	local snapshot = Snapshot.ForPlayer(player)
 	if snapshot then
@@ -135,6 +137,7 @@ end
 
 local function onPlayerRemoving(player: Player)
 	HeroWorld.Clear(player)
+	GateDisplay.Clear(player)
 	Academy.Release(player)
 	PlayerData.Remove(player)
 end

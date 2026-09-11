@@ -672,6 +672,44 @@ local function worldTopY(part: BasePart): number
 	return maxY
 end
 
+local function padStandLift(): number
+	local display = GameConfig.Display
+	local config = display and display.HeroModels
+	local value = config and config.PadStandLift
+	if typeof(value) == "number" then
+		return math.max(0, value)
+	end
+	return 0.28
+end
+
+-- Lowest world Y of any BasePart corner (more reliable than GetBoundingBox alone).
+local function modelExtentBottomY(model: Model): number
+	local minY = math.huge
+	local any = false
+	for _, inst in model:GetDescendants() do
+		if inst:IsA("BasePart") then
+			any = true
+			local cf = inst.CFrame
+			local half = inst.Size * 0.5
+			for _, x in { -1, 1 } do
+				for _, y in { -1, 1 } do
+					for _, z in { -1, 1 } do
+						local world = cf:PointToWorldSpace(Vector3.new(half.X * x, half.Y * y, half.Z * z))
+						if world.Y < minY then
+							minY = world.Y
+						end
+					end
+				end
+			end
+		end
+	end
+	if not any then
+		local boxCF, boxSize = model:GetBoundingBox()
+		return boxCF.Position.Y - boxSize.Y * 0.5
+	end
+	return minY
+end
+
 local function circleDiameter(part: BasePart): number
 	local x, y, z = part.Size.X, part.Size.Y, part.Size.Z
 	local largest = math.max(x, y, z)
@@ -720,12 +758,15 @@ local function placeModelOnPad(model: Model, pad: BasePart)
 		fitModelUniform(model)
 		model:SetAttribute("Fitted", true)
 	end
-	local boxCF, boxSize = model:GetBoundingBox()
 	local pivot = model:GetPivot()
-	local offset = pivot.Position - boxCF.Position
+	local bottomY = modelExtentBottomY(model)
 	local topY = worldTopY(pad)
-	local targetCenter = Vector3.new(pad.Position.X, topY + boxSize.Y / 2, pad.Position.Z)
-	model:PivotTo(CFrame.new(targetCenter + offset) * (pivot - pivot.Position))
+	local delta = Vector3.new(
+		pad.Position.X - pivot.Position.X,
+		(topY + padStandLift()) - bottomY,
+		pad.Position.Z - pivot.Position.Z
+	)
+	model:PivotTo(pivot + delta)
 end
 
 local function placePartOnPad(marker: BasePart, pad: BasePart)
@@ -760,12 +801,26 @@ local function modelStandCFrame(model: Model, ground: BasePart): CFrame
 		fitModelUniform(model)
 		model:SetAttribute("Fitted", true)
 	end
-	local boxCF, boxSize = model:GetBoundingBox()
 	local pivot = model:GetPivot()
-	local offset = pivot.Position - boxCF.Position
+	local bottomY = modelExtentBottomY(model)
 	local topY = worldTopY(ground)
-	local targetCenter = Vector3.new(ground.Position.X, topY + boxSize.Y / 2, ground.Position.Z)
-	return CFrame.new(targetCenter + offset) * (pivot - pivot.Position)
+	local pos = Vector3.new(
+		ground.Position.X,
+		pivot.Position.Y + ((topY + padStandLift()) - bottomY),
+		ground.Position.Z
+	)
+	return CFrame.new(pos) * (pivot - pivot.Position)
+end
+
+local function seatModelOnPad(model: Model, pad: BasePart, heroId: string)
+	placeModelOnPad(model, pad)
+	playHeroAnim(model, heroId, "idle")
+	-- Dance pose changes foot height; re-seat once the clip is posing.
+	task.delay(0.2, function()
+		if model.Parent then
+			placeModelOnPad(model, pad)
+		end
+	end)
 end
 
 local function stopWalk(heroId: string)
@@ -785,10 +840,11 @@ local function finishWalk(userId: number, heroId: string, display: Instance, pad
 		walking[heroId] = nil
 	end
 	if display.Parent then
-		placeOnPad(display, pad)
 		display:SetAttribute("WalkedIn", true)
 		if display:IsA("Model") then
-			playHeroAnim(display, heroId, "idle")
+			seatModelOnPad(display, pad, heroId)
+		else
+			placeOnPad(display, pad)
 		end
 	end
 	walkBusyByUser[userId] = false
@@ -1044,18 +1100,20 @@ function HeroWorld.Sync(player: Player)
 					requested[hero.HeroID] = nil
 					enqueueWalk(userId, hero.HeroID, display, pad, exitGate)
 				else
-					placeOnPad(display, pad)
-					display:SetAttribute("WalkedIn", true)
 					if display:IsA("Model") then
-						playHeroAnim(display, hero.HeroID, "idle")
+						seatModelOnPad(display, pad, hero.HeroID)
+					else
+						placeOnPad(display, pad)
 					end
+					display:SetAttribute("WalkedIn", true)
 				end
 			else
-				placeOnPad(display, pad)
-				display:SetAttribute("WalkedIn", true)
 				if display:IsA("Model") then
-					playHeroAnim(display, hero.HeroID, "idle")
+					seatModelOnPad(display, pad, hero.HeroID)
+				else
+					placeOnPad(display, pad)
 				end
+				display:SetAttribute("WalkedIn", true)
 			end
 		end
 	end
